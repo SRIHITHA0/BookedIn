@@ -8,9 +8,37 @@ import { Book, Genre, UserBookStatus } from '../../models/book.model';
 export interface ReviewResponse {
   username: string;
   displayName: string;
+  profilePictureUrl: string | null;
   rating: number;
   review: string;
   addedAt: string;
+}
+
+export interface ShelfBook {
+  book: {
+    id: number;
+    title: string;
+    author: string;
+    coverImageUrl: string;
+    genre: { name: string } | null;
+    averageRating: number;
+  };
+  status: string;
+  rating: number | null;
+  review: string | null;
+  addedAt: string;
+}
+
+export interface CommunityReview {
+  username: string;
+  displayName: string;
+  profilePictureUrl: string | null;
+  rating: number;
+  review: string | null;
+  addedAt: string;
+  bookId: number;
+  bookTitle: string;
+  bookCoverImageUrl: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -26,6 +54,10 @@ export class BookService {
 
   getRecommendedBooks(): Observable<Book[]> {
     return this.http.get<Book[]>(this.apiUrl);
+  }
+
+  getForYouBooks(): Observable<Book[]> {
+    return this.http.get<Book[]>(`${this.apiUrl}/for-you`);
   }
 
   getBookById(id: number): Observable<Book> {
@@ -72,5 +104,13 @@ export class BookService {
 
   deleteReview(bookId: number): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/api/reviews/${bookId}`);
+  }
+
+  getMyShelf(): Observable<ShelfBook[]> {
+    return this.http.get<ShelfBook[]>(`${environment.apiUrl}/api/shelf`);
+  }
+
+  getRecentCommunityReviews(): Observable<CommunityReview[]> {
+    return this.http.get<CommunityReview[]>(`${environment.apiUrl}/api/reviews/recent`);
   }
 }

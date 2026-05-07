@@ -7,6 +7,7 @@ import com.cts.mfrp.bkin.service.BookService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -44,6 +45,11 @@ public class BookController {
     @GetMapping("/genre/{genreName}")
     public ResponseEntity<List<Book>> byGenre(@PathVariable String genreName) {
         return ResponseEntity.ok(bookService.getBooksByGenre(genreName));
+    }
+
+    @GetMapping("/for-you")
+    public ResponseEntity<List<Book>> getForYou(Principal principal) {
+        return ResponseEntity.ok(bookService.getBooksByUserInterests(principal.getName()));
     }
 
     @GetMapping("/genres")

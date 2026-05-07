@@ -5,6 +5,7 @@ import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { ChatService, Conversation } from '../../core/services/chat.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 import { ChatMessage } from '../../models/chat-message.model';
 
 @Component({
@@ -22,6 +23,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   roomId = '';
   currentUsername = '';
   currentDisplayName = '';
+  currentProfilePicUrl = '';
   personalConversations: Conversation[] = [];
   isLoadingHistory = false;
 
@@ -30,19 +32,33 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private shouldScroll = false;
 
   sidebarOpen = false;
+  personalSearchQuery = '';
 
   readonly groupRooms = ['general', 'fiction', 'mystery', 'sci-fi', 'fantasy', 'thriller'];
+
+  get filteredPersonalConversations(): Conversation[] {
+    const q = this.personalSearchQuery.trim().toLowerCase();
+    if (!q) return this.personalConversations;
+    return this.personalConversations.filter(c =>
+      c.otherDisplayName.toLowerCase().includes(q) ||
+      c.otherUsername.toLowerCase().includes(q)
+    );
+  }
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private chatService: ChatService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
     this.currentUsername    = this.authService.getUsername();
     this.currentDisplayName = this.authService.getDisplayName();
+    this.userService.getMyProfile().subscribe({
+      next: (p) => this.currentProfilePicUrl = p.profilePictureUrl ?? ''
+    });
     this.loadPersonalConversations();
 
     // Subscribe to param changes so switching rooms in the sidebar works

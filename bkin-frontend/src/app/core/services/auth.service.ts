@@ -41,7 +41,19 @@ export class AuthService {
   }
 
   isLoggedIn(): boolean {
-    return !!localStorage.getItem('bkin_jwt_token');
+    const token = localStorage.getItem('bkin_jwt_token');
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      if (payload.exp * 1000 <= Date.now()) {
+        this.logout();
+        return false;
+      }
+      return true;
+    } catch {
+      this.logout();
+      return false;
+    }
   }
 
   getDisplayName(): string {

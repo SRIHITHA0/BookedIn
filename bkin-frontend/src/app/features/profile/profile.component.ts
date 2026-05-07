@@ -4,7 +4,6 @@ import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angula
 import { RouterModule, Router } from '@angular/router';
 import { UserService, UserProfile, ShelfItem } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
-import { ThemeService } from '../../core/services/theme.service';
 
 @Component({
   selector: 'app-profile',
@@ -37,8 +36,7 @@ export class ProfileComponent implements OnInit {
     private userService: UserService,
     private authService: AuthService,
     private fb: FormBuilder,
-    private router: Router,
-    public  theme: ThemeService
+    private router: Router
   ) {
     this.profileForm = this.fb.group({
       displayName:       ['', [Validators.required, Validators.maxLength(100)]],

@@ -42,6 +42,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/profile/profile.component').then(m => m.ProfileComponent)
   },
   {
+    path: 'library',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/library/library.component').then(m => m.LibraryComponent)
+  },
+  {
     path: 'shelf',
     canActivate: [authGuard],
     loadComponent: () => import('./features/shelf/shelf.component').then(m => m.ShelfComponent)

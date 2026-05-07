@@ -18,7 +18,10 @@
         </svg>
         Home
       </a>
-      <a routerLink="/home" class="text-crimson font-extrabold tracking-tight hover:opacity-80 transition-opacity">BookedIn</a>
+      <a routerLink="/home" class="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
+        <img src="assets/bookedin_logo_transparent.png" alt="" class="h-6 w-auto" />
+        <span class="text-crimson font-extrabold tracking-tight">BookedIn</span>
+      </a>
       <!-- Mobile close button -->
       <button (click)="sidebarOpen = false" class="lg:hidden p-1 text-gray-500 hover:text-white transition-colors ml-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -38,7 +41,6 @@
             ? 'bg-crimson/15 text-white border-l-2 border-crimson'
             : 'text-gray-400 hover:bg-surface-200 hover:text-white border-l-2 border-transparent'"
           class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
-          <span class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0 opacity-80"></span>
           <span class="text-sm capitalize">{{ room }}</span>
         </button>
       </div>
@@ -46,11 +48,34 @@
       <!-- Personal -->
       <div class="px-3 pt-3 pb-4">
         <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2 px-2">Personal</p>
+
+        <!-- Personal search bar -->
+        <div class="relative mb-2">
+          <input type="text" [(ngModel)]="personalSearchQuery"
+            placeholder="Search conversations..."
+            class="w-full bg-surface-200 border border-surface-300 text-white placeholder-gray-600
+                   rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-crimson transition-all pr-7" />
+          <svg *ngIf="!personalSearchQuery" xmlns="http://www.w3.org/2000/svg"
+            class="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+          <button *ngIf="personalSearchQuery" (click)="personalSearchQuery = ''"
+            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+            </svg>
+          </button>
+        </div>
+
         <p *ngIf="personalConversations.length === 0"
           class="text-gray-600 text-xs px-2 italic leading-relaxed">
           No conversations yet.<br/>Use "Let's Connect" on book reviews.
         </p>
-        <button *ngFor="let conv of personalConversations" (click)="navigateToRoom(conv.roomId)"
+        <p *ngIf="personalConversations.length > 0 && filteredPersonalConversations.length === 0"
+          class="text-gray-600 text-xs px-2 italic">No results found.</p>
+        <button *ngFor="let conv of filteredPersonalConversations" (click)="navigateToRoom(conv.roomId)"
           [ngClass]="roomId === conv.roomId
             ? 'bg-crimson/15 border-l-2 border-crimson'
             : 'border-l-2 border-transparent hover:bg-surface-200'"
@@ -119,13 +144,16 @@
 
       <!-- Message bubbles -->
       <div *ngFor="let msg of messages"
-        [ngClass]="msg.senderUsername === currentUsername ? 'flex justify-end' : 'flex justify-start items-end gap-2'">
+        [ngClass]="msg.senderUsername === currentUsername ? 'flex justify-end items-end gap-2' : 'flex justify-start items-end gap-2'">
 
-        <!-- Other user avatar -->
+        <!-- Other user avatar (left) -->
         <div *ngIf="msg.senderUsername !== currentUsername"
           class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
-                 flex items-center justify-center text-white text-xs font-bold flex-shrink-0 mb-0.5">
-          {{ avatarLetter(msg.senderDisplayName) }}
+                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden">
+          <img *ngIf="msg.senderProfilePictureUrl" [src]="msg.senderProfilePictureUrl"
+            class="w-full h-full object-cover"
+            onerror="this.onerror=null;this.style.display='none'" />
+          <span *ngIf="!msg.senderProfilePictureUrl">{{ avatarLetter(msg.senderDisplayName) }}</span>
         </div>
 
         <!-- Bubble -->
@@ -141,6 +169,16 @@
           <p class="text-[10px] mt-1 opacity-60 text-right whitespace-nowrap">
             {{ msg.sentAt | date:'h:mm a' }}
           </p>
+        </div>
+
+        <!-- Current user avatar (right) -->
+        <div *ngIf="msg.senderUsername === currentUsername"
+          class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-crimson/20 border border-crimson/40
+                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden">
+          <img *ngIf="currentProfilePicUrl" [src]="currentProfilePicUrl"
+            class="w-full h-full object-cover"
+            onerror="this.onerror=null;this.style.display='none'" />
+          <span *ngIf="!currentProfilePicUrl">{{ avatarLetter(currentDisplayName) }}</span>
         </div>
       </div>
     </div>

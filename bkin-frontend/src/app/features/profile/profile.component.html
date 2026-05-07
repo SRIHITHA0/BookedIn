@@ -10,19 +10,9 @@
       </button>
       <h1 class="text-white font-semibold text-sm sm:text-base">My Profile</h1>
       <div class="ml-auto flex items-center gap-2">
-        <!-- Theme toggle -->
-        <button (click)="theme.toggle()" class="p-2 text-gray-400 hover:text-crimson transition-colors rounded-lg">
-          <svg *ngIf="theme.isDark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
-          </svg>
-          <svg *ngIf="!theme.isDark" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/>
-          </svg>
-        </button>
-        <a routerLink="/home" class="text-crimson text-lg sm:text-xl font-extrabold tracking-tight hover:opacity-80 transition-opacity">
-          BookedIn
+        <a routerLink="/home" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <img src="assets/bookedin_logo_transparent.png" alt="" class="h-7 sm:h-8 w-auto" />
+          <span class="text-crimson text-lg sm:text-xl font-extrabold tracking-tight">BookedIn</span>
         </a>
       </div>
     </div>

@@ -28,7 +28,7 @@ public class User {
     @Column(columnDefinition = "TEXT")
     private String bio;
 
-    @Column(name = "profile_picture_url", length = 500)
+    @Column(name = "profile_picture_url", columnDefinition = "LONGTEXT")
     private String profilePictureUrl;
 
     @Column(name = "is_active")

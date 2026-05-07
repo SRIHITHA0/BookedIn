@@ -1,7 +1,18 @@
 {
   "permissions": {
     "allow": [
-      "Bash(git *)"
+      "Bash(git *)",
+      "Bash(python -c \"import docx; print\\('python-docx OK'\\)\")",
+      "Bash(py --version)",
+      "Bash(mkdir -p \"C:/Users/2479802/Downloads/BookedIn/_report_gen\")",
+      "Bash(npm init *)",
+      "Bash(npm install *)",
+      "Bash(node generate.js)",
+      "Bash(xargs grep -l \"interceptor\\\\|Interceptor\\\\|HttpInterceptor\")",
+      "Bash(xargs grep -l \"ChatMessage\\\\|chatMessage\\\\|chat\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\2479802\\\\Downloads\\\\BookedIn\\\\bkin-frontend\\\\src\\\\app\\\\features\" -Recurse -Include \"*.html\" -ErrorAction SilentlyContinue)",
+      "Bash(Measure-Object)",
+      "Bash(Select-Object -ExpandProperty Count)"
     ]
   }
 }

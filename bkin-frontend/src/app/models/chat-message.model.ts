@@ -3,5 +3,6 @@ export interface ChatMessage {
   type: string;
   senderUsername: string;
   senderDisplayName: string;
+  senderProfilePictureUrl?: string | null;
   sentAt: string;
 }

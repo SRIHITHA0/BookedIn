@@ -6,23 +6,24 @@
 
 @layer base {
   body {
-    @apply bg-obsidian text-white font-sans;
-    transition: background-color 0.25s ease, color 0.25s ease;
+    background-color: #EFF4FF;
+    color: #111827;
+    @apply font-sans;
   }
   * { @apply box-border; }
 
   /* Scrollbar */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
-  ::-webkit-scrollbar-track { @apply bg-surface-200; }
-  ::-webkit-scrollbar-thumb { @apply bg-surface-400 rounded-full; }
+  ::-webkit-scrollbar-track { background-color: #F0F5FF; }
+  ::-webkit-scrollbar-thumb { background-color: #C7D7F8; border-radius: 9999px; }
   ::-webkit-scrollbar-thumb:hover { @apply bg-crimson; }
 }
 
 @layer components {
   .bkin-input {
-    @apply w-full bg-surface-200 border border-surface-300 text-white placeholder-gray-600
+    @apply w-full bg-white border border-surface-400 text-gray-900 placeholder-gray-400
            rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-crimson
-           focus:ring-1 focus:ring-crimson/40 transition-all duration-200;
+           focus:ring-1 focus:ring-crimson/30 transition-all duration-200;
   }
   .bkin-error  { @apply text-crimson text-xs mt-1 block; }
   .bkin-btn-primary {
@@ -31,43 +32,32 @@
            transition-all duration-200 shadow-crimson hover:shadow-crimson-lg;
   }
   .bkin-card {
-    @apply bg-surface-100 border border-surface-300 rounded-xl overflow-hidden
+    @apply bg-white border border-surface-300 rounded-xl overflow-hidden
            hover:border-crimson/40 transition-all duration-200;
   }
-  .genre-tag         { @apply px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer; }
-  .genre-tag-active  { @apply bg-crimson text-white border-crimson; }
-  .genre-tag-inactive { @apply bg-transparent text-gray-400 border-surface-300 hover:border-crimson/50 hover:text-gray-200; }
+  .genre-tag          { @apply px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 cursor-pointer; }
+  .genre-tag-active   { @apply bg-crimson text-white border-crimson; }
+  .genre-tag-inactive { @apply bg-transparent text-gray-500 border-surface-400 hover:border-crimson/50 hover:text-gray-700; }
 }
 
-/* ─── Light mode overrides ───────────────────────────────────────────────── */
-html.light {
-  color-scheme: light;
-}
-html.light body                     { background-color: #F3F4F6; color: #111827; }
-html.light .bg-obsidian             { background-color: #F3F4F6 !important; }
-html.light .bg-surface-100         { background-color: #FFFFFF !important; }
-html.light .bg-surface-200         { background-color: #F3F4F6 !important; }
-html.light .bg-surface-300         { background-color: #E5E7EB !important; }
-html.light .border-surface-300     { border-color: #D1D5DB !important; }
-html.light .border-surface-400     { border-color: #9CA3AF !important; }
-html.light .text-white             { color: #111827 !important; }
-html.light .text-gray-200          { color: #374151 !important; }
-html.light .text-gray-300          { color: #4B5563 !important; }
-html.light .text-gray-400          { color: #4B5563 !important; }
-html.light .text-gray-500          { color: #6B7280 !important; }
-html.light .text-gray-600          { color: #9CA3AF !important; }
-html.light .placeholder-gray-600::placeholder { color: #9CA3AF !important; }
-html.light .bkin-input             { background-color: #FFFFFF !important; border-color: #D1D5DB !important; color: #111827 !important; }
-html.light .bkin-input::placeholder { color: #9CA3AF !important; }
-html.light .bkin-card              { background-color: #FFFFFF !important; border-color: #E5E7EB !important; }
-html.light nav                     { background-color: rgba(255,255,255,0.9) !important; border-color: #E5E7EB !important; }
-html.light .backdrop-blur-md       { --tw-backdrop-blur: blur(12px); }
-html.light .bg-surface-100\/80     { background-color: rgba(255,255,255,0.85) !important; }
-/* Keep crimson as brand colour */
-html.light .text-crimson           { color: #DC143C !important; }
-html.light .border-crimson\/40     { border-color: rgba(220,20,60,0.4) !important; }
-html.light .bg-crimson\/20         { background-color: rgba(220,20,60,0.1) !important; }
-html.light .bg-crimson\/10         { background-color: rgba(220,20,60,0.06) !important; }
-html.light .bg-crimson\/15         { background-color: rgba(220,20,60,0.08) !important; }
-html.light .bg-obsidian\/80        { background-color: rgba(255,255,255,0.9) !important; }
-html.light .shadow-crimson         { box-shadow: 0 4px 32px rgba(220,20,60,0.15) !important; }
+/* ─── Global text overrides for light theme ──────────────────────────────── */
+.text-white       { color: #111827 !important; }
+.text-gray-200    { color: #374151 !important; }
+.text-gray-300    { color: #4B5563 !important; }
+.text-gray-400    { color: #6B7280 !important; }
+.text-gray-500    { color: #6B7280 !important; }
+.text-gray-600    { color: #9CA3AF !important; }
+.placeholder-gray-600::placeholder { color: #9CA3AF !important; }
+nav               { background-color: rgba(255,255,255,0.92) !important; border-color: #E2EAFF !important; }
+.bg-obsidian\/80  { background-color: rgba(255,255,255,0.92) !important; }
+.bg-crimson\/10   { background-color: rgba(34,67,182,0.08) !important; }
+.bg-crimson\/15   { background-color: rgba(34,67,182,0.12) !important; }
+.bg-crimson\/20   { background-color: rgba(34,67,182,0.15) !important; }
+.bg-crimson\/30   { background-color: rgba(34,67,182,0.22) !important; }
+.border-crimson\/40 { border-color: rgba(34,67,182,0.40) !important; }
+.border-crimson\/50 { border-color: rgba(34,67,182,0.50) !important; }
+.ring-crimson\/30   { --tw-ring-color: rgba(34,67,182,0.30) !important; }
+/* All text on solid dark blue (bg-crimson) backgrounds must stay white */
+.bg-crimson { color: #ffffff !important; }
+.bg-crimson .text-white,
+.bg-crimson.text-white { color: #ffffff !important; }

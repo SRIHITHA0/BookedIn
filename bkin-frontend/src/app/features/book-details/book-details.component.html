@@ -9,7 +9,10 @@
         </svg>
         <span class="hidden sm:inline">Back</span>
       </button>
-      <a routerLink="/home" class="text-crimson text-xl font-extrabold tracking-tight ml-auto hover:opacity-80 transition-opacity">BookedIn</a>
+      <a routerLink="/home" class="ml-auto flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <img src="assets/bookedin_logo_transparent.png" alt="" class="h-7 sm:h-8 w-auto" />
+        <span class="text-crimson text-xl font-extrabold tracking-tight">BookedIn</span>
+      </a>
     </div>
   </nav>
 
@@ -143,8 +146,11 @@
           <div class="flex items-start justify-between gap-3 mb-3">
             <div class="flex items-center gap-3">
               <div class="w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center
-                          justify-center text-crimson text-sm font-bold flex-shrink-0">
-                {{ avatarLetter(review.displayName) }}
+                          justify-center text-crimson text-sm font-bold flex-shrink-0 overflow-hidden">
+                <img *ngIf="review.profilePictureUrl" [src]="review.profilePictureUrl"
+                  class="w-full h-full object-cover"
+                  onerror="this.onerror=null;this.style.display='none'" />
+                <span *ngIf="!review.profilePictureUrl">{{ avatarLetter(review.displayName) }}</span>
               </div>
               <div>
                 <p class="text-white text-sm font-medium leading-tight">{{ review.displayName }}</p>

@@ -8,6 +8,7 @@ public class MessageResponseDto {
     private String roomId;
     private String senderUsername;
     private String senderDisplayName;
+    private String senderProfilePictureUrl;
     private String content;
     private String type;
     private String sentAt;   // ISO-8601 string — never an array
@@ -20,9 +21,10 @@ public class MessageResponseDto {
         dto.senderDisplayName = msg.getSender().getDisplayName() != null
             ? msg.getSender().getDisplayName()
             : msg.getSender().getUsername();
+        dto.senderProfilePictureUrl = msg.getSender().getProfilePictureUrl();
         dto.content = msg.getContent();
         dto.type = msg.getMessageType().name();
-        dto.sentAt = msg.getSentAt().toString();   // "2024-01-15T10:30:45"
+        dto.sentAt = msg.getSentAt().toString();
         return dto;
     }
 
@@ -30,6 +32,7 @@ public class MessageResponseDto {
     public String getRoomId() { return roomId; }
     public String getSenderUsername() { return senderUsername; }
     public String getSenderDisplayName() { return senderDisplayName; }
+    public String getSenderProfilePictureUrl() { return senderProfilePictureUrl; }
     public String getContent() { return content; }
     public String getType() { return type; }
     public String getSentAt() { return sentAt; }

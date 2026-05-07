@@ -1,30 +1,31 @@
-import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { CommonModule, DecimalPipe } from '@angular/common';
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { BookService } from '../../core/services/book.service';
+import { BookService, ShelfBook, CommunityReview } from '../../core/services/book.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 import { ChatService, Conversation } from '../../core/services/chat.service';
-import { ThemeService } from '../../core/services/theme.service';
-import { Book, Genre } from '../../models/book.model';
+import { Book } from '../../models/book.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, DecimalPipe],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
 
-  @ViewChild('booksSection') booksSection!: ElementRef;
-
-  recommendedBooks: Book[]  = [];
-  trendingBooks:    Book[]  = [];
-  genres:           Genre[] = [];
+  trendingBooks:         Book[]           = [];
+  forYouBooks:           Book[]           = [];
+  currentlyReadingBooks: ShelfBook[]      = [];
+  communityReviews:      CommunityReview[] = [];
+  searchResults:         Book[]           = [];
   searchQuery           = '';
-  selectedGenreFilter   = 'all';
-  isLoading             = false;
+  isSearchActive        = false;
+  isSearchLoading       = false;
   displayName           = '';
+  myProfilePicUrl       = '';
   showChatSelector      = false;
   showMobileSearch      = false;
   showMobileMenu        = false;
@@ -36,8 +37,8 @@ export class HomeComponent implements OnInit {
   constructor(
     private bookService: BookService,
     private authService: AuthService,
+    private userService: UserService,
     private chatService: ChatService,
-    public  theme: ThemeService,
     private router: Router
   ) {}
 
@@ -47,16 +48,12 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.displayName = this.authService.getDisplayName();
-    this.loadRecommendedBooks();
     this.loadTrendingBooks();
-    this.loadGenres();
-  }
-
-  loadRecommendedBooks(): void {
-    this.isLoading = true;
-    this.bookService.getRecommendedBooks().subscribe({
-      next: (books) => { this.recommendedBooks = books; this.isLoading = false; },
-      error: () => { this.isLoading = false; }
+    this.loadForYouBooks();
+    this.loadCurrentlyReading();
+    this.loadCommunityReviews();
+    this.userService.getMyProfile().subscribe({
+      next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
     });
   }
 
@@ -66,54 +63,45 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  loadGenres(): void {
-    this.bookService.getAllGenres().subscribe({
-      next: (genres) => this.genres = genres
+  loadForYouBooks(): void {
+    this.bookService.getForYouBooks().subscribe({
+      next: (books) => this.forYouBooks = books,
+      error: () => this.forYouBooks = []
+    });
+  }
+
+  loadCurrentlyReading(): void {
+    this.bookService.getMyShelf().subscribe({
+      next: (items) => this.currentlyReadingBooks = items.filter(i => i.status === 'READING').slice(0, 3),
+      error: () => {}
+    });
+  }
+
+  loadCommunityReviews(): void {
+    this.bookService.getRecentCommunityReviews().subscribe({
+      next: (reviews) => this.communityReviews = reviews,
+      error: () => {}
     });
   }
 
   onSearch(): void {
     const q = this.searchQuery.trim();
-    if (!q) {
-      this.selectedGenreFilter = 'all';
-      this.loadRecommendedBooks();
-      return;
-    }
-    this.selectedGenreFilter = 'all';
+    if (!q) return;
     this.showMobileSearch = false;
-    this.isLoading = true;
+    this.isSearchActive = true;
+    this.isSearchLoading = true;
+    this.searchResults = [];
     this.bookService.searchBooks(q).subscribe({
-      next: (books) => {
-        this.recommendedBooks = books;
-        this.isLoading = false;
-        setTimeout(() => this.scrollToResults(), 100);
-      },
-      error: () => { this.recommendedBooks = []; this.isLoading = false; }
+      next: (books) => { this.searchResults = books; this.isSearchLoading = false; },
+      error: () => { this.searchResults = []; this.isSearchLoading = false; }
     });
-  }
-
-  private scrollToResults(): void {
-    this.booksSection?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
 
   clearSearch(): void {
     this.searchQuery = '';
-    this.selectedGenreFilter = 'all';
-    this.loadRecommendedBooks();
-  }
-
-  filterByGenre(genreName: string): void {
-    this.selectedGenreFilter = genreName;
-    this.searchQuery = '';
-    if (genreName === 'all') {
-      this.loadRecommendedBooks();
-      return;
-    }
-    this.isLoading = true;
-    this.bookService.getBooksByGenre(genreName).subscribe({
-      next: (books) => { this.recommendedBooks = books; this.isLoading = false; },
-      error: () => { this.recommendedBooks = []; this.isLoading = false; }
-    });
+    this.searchResults = [];
+    this.isSearchActive = false;
+    this.isSearchLoading = false;
   }
 
   goToBook(id: number): void { this.router.navigate(['/books', id]); }

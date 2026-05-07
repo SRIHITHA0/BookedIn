@@ -41,11 +41,12 @@ export class ChatService {
           try {
             const raw = JSON.parse(msg.body);
             const chatMsg: ChatMessage = {
-              content:           raw.content,
-              type:              raw.type ?? 'TEXT',
-              senderUsername:    raw.senderUsername,
-              senderDisplayName: raw.senderDisplayName,
-              sentAt:            raw.sentAt
+              content:                  raw.content,
+              type:                     raw.type ?? 'TEXT',
+              senderUsername:           raw.senderUsername,
+              senderDisplayName:        raw.senderDisplayName,
+              senderProfilePictureUrl:  raw.senderProfilePictureUrl ?? null,
+              sentAt:                   raw.sentAt
             };
             this.messageSubject.next(chatMsg);
           } catch { /* ignore malformed frames */ }

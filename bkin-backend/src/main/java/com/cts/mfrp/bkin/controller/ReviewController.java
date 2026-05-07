@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import org.springframework.data.domain.PageRequest;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.security.Principal;
@@ -29,6 +30,16 @@ public class ReviewController {
         this.userBookRepository = userBookRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+    }
+
+    @GetMapping("/recent")
+    public ResponseEntity<List<ReviewResponseDto>> getRecentReviews() {
+        List<ReviewResponseDto> reviews = userBookRepository
+            .findRecentReviews(PageRequest.of(0, 8))
+            .stream()
+            .map(ReviewResponseDto::from)
+            .toList();
+        return ResponseEntity.ok(reviews);
     }
 
     @GetMapping("/book/{bookId}")
