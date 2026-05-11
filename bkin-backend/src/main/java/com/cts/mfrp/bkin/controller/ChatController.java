@@ -55,7 +55,7 @@ public class ChatController {
             sender.getDisplayName() != null ? sender.getDisplayName() : sender.getUsername()
         );
         incoming.setSenderProfilePictureUrl(sender.getProfilePictureUrl());
-        incoming.setSentAt(persisted.getSentAt().toString());
+        incoming.setSentAt(persisted.getSentAt().toString() + "Z");
 
         messagingTemplate.convertAndSend("/topic/chat/" + roomId, incoming);
     }

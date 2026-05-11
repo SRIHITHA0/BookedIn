@@ -24,7 +24,7 @@ public class MessageResponseDto {
         dto.senderProfilePictureUrl = msg.getSender().getProfilePictureUrl();
         dto.content = msg.getContent();
         dto.type = msg.getMessageType().name();
-        dto.sentAt = msg.getSentAt().toString();
+        dto.sentAt = msg.getSentAt().toString() + "Z";
         return dto;
     }
 
