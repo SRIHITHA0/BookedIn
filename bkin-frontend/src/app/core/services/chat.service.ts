@@ -10,6 +10,7 @@ export interface Conversation {
   roomId: string;
   otherUsername: string;
   otherDisplayName: string;
+  otherProfilePictureUrl: string | null;
   lastMessage: string;
   lastMessageAt: string;
 }

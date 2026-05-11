@@ -81,8 +81,11 @@
             : 'border-l-2 border-transparent hover:bg-surface-200'"
           class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
           <div class="w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40
-                      flex items-center justify-center text-crimson text-sm font-bold flex-shrink-0">
-            {{ avatarLetter(conv.otherDisplayName) }}
+                      flex items-center justify-center text-crimson text-sm font-bold flex-shrink-0 overflow-hidden">
+            <img *ngIf="conv.otherProfilePictureUrl" [src]="conv.otherProfilePictureUrl"
+              class="w-full h-full object-cover"
+              onerror="this.onerror=null;this.style.display='none'" />
+            <span *ngIf="!conv.otherProfilePictureUrl">{{ avatarLetter(conv.otherDisplayName) }}</span>
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-white text-sm font-medium truncate">{{ conv.otherDisplayName }}</p>

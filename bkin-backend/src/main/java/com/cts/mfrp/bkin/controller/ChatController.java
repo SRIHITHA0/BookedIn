@@ -105,6 +105,7 @@ public class ChatController {
                 dto.setOtherUsername(otherUsername);
                 dto.setOtherDisplayName(otherUser != null && otherUser.getDisplayName() != null
                     ? otherUser.getDisplayName() : otherUsername);
+                dto.setOtherProfilePictureUrl(otherUser != null ? otherUser.getProfilePictureUrl() : null);
                 dto.setLastMessage(lastMsg != null ? lastMsg.getContent() : "");
                 dto.setLastMessageAt(lastMsg != null ? lastMsg.getSentAt().toString() : "");
                 return dto;
