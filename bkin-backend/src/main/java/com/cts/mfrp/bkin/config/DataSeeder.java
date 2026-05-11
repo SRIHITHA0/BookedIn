@@ -33,6 +33,7 @@ public class DataSeeder {
     @Bean
     CommandLineRunner seedDatabase(GenreRepository genreRepository, BookRepository bookRepository) {
         return args -> {
+
             if (genreRepository.count() == 0) {
                 List<Genre> savedGenres = genreRepository.saveAll(List.of(
                     new Genre("Fiction",         "Stories created from imagination"),
@@ -152,11 +153,12 @@ public class DataSeeder {
                     "A shepherd boy travels from Spain to Egypt in search of a worldly treasure.",
                     extra.get("The Alchemist"), LocalDate.of(1988, 1, 1), allGenres.get("Fiction")));
 
-            if (!existingTitles.contains("To Kill a Mockingbird"))
+            if (!existingTitles.contains("To Kill a Mockingbird")) {
+                System.out.println("books");
                 extraBooks.add(new Book("To Kill a Mockingbird", "Harper Lee", "9780061935466",
-                    "A young girl witnesses racial injustice in the American South through her father's eyes.",
-                    extra.get("To Kill a Mockingbird"), LocalDate.of(1960, 7, 11), allGenres.get("Fiction")));
-
+                        "A young girl witnesses racial injustice in the American South through her father's eyes.",
+                        extra.get("To Kill a Mockingbird"), LocalDate.of(1960, 7, 11), allGenres.get("Fiction")));
+            }
             if (!existingTitles.contains("1984"))
                 extraBooks.add(new Book("1984", "George Orwell", "9780451524935",
                     "A totalitarian society surveils and controls every aspect of life in a dystopian future.",
