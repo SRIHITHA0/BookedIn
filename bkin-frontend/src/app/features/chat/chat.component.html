@@ -112,8 +112,11 @@
       <!-- Room avatar -->
       <div *ngIf="isDmRoom"
         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-crimson/20 border border-crimson/40
-               flex items-center justify-center text-crimson font-bold flex-shrink-0">
-        {{ avatarLetter(roomDisplayName) }}
+               flex items-center justify-center text-crimson font-bold flex-shrink-0 overflow-hidden">
+        <img *ngIf="dmPartnerProfilePic" [src]="dmPartnerProfilePic"
+          class="w-full h-full object-cover"
+          onerror="this.onerror=null;this.style.display='none'" />
+        <span *ngIf="!dmPartnerProfilePic">{{ avatarLetter(roomDisplayName) }}</span>
       </div>
       <div *ngIf="!isDmRoom"
         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-300
