@@ -4,6 +4,7 @@ public class ConversationDto {
     private String roomId;
     private String otherUsername;
     private String otherDisplayName;
+    private String otherProfilePictureUrl;
     private String lastMessage;
     private String lastMessageAt;
 
@@ -13,6 +14,8 @@ public class ConversationDto {
     public void setOtherUsername(String otherUsername) { this.otherUsername = otherUsername; }
     public String getOtherDisplayName() { return otherDisplayName; }
     public void setOtherDisplayName(String otherDisplayName) { this.otherDisplayName = otherDisplayName; }
+    public String getOtherProfilePictureUrl() { return otherProfilePictureUrl; }
+    public void setOtherProfilePictureUrl(String otherProfilePictureUrl) { this.otherProfilePictureUrl = otherProfilePictureUrl; }
     public String getLastMessage() { return lastMessage; }
     public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
     public String getLastMessageAt() { return lastMessageAt; }

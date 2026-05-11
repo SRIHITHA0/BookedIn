@@ -54,7 +54,9 @@ public class ChatController {
         incoming.setSenderDisplayName(
             sender.getDisplayName() != null ? sender.getDisplayName() : sender.getUsername()
         );
-        incoming.setSenderProfilePictureUrl(sender.getProfilePictureUrl());
+        incoming.setSenderProfilePictureUrl(sender.getProfilePictureUrl() != null
+            ? "/api/users/" + sender.getUsername() + "/avatar"
+            : null);
         incoming.setSentAt(persisted.getSentAt().toString() + "Z");
 
         messagingTemplate.convertAndSend("/topic/chat/" + roomId, incoming);
@@ -105,6 +107,9 @@ public class ChatController {
                 dto.setOtherUsername(otherUsername);
                 dto.setOtherDisplayName(otherUser != null && otherUser.getDisplayName() != null
                     ? otherUser.getDisplayName() : otherUsername);
+                dto.setOtherProfilePictureUrl(otherUser != null && otherUser.getProfilePictureUrl() != null
+                    ? "/api/users/" + otherUsername + "/avatar"
+                    : null);
                 dto.setLastMessage(lastMsg != null ? lastMsg.getContent() : "");
                 dto.setLastMessageAt(lastMsg != null ? lastMsg.getSentAt().toString() : "");
                 return dto;

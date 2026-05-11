@@ -81,8 +81,11 @@
             : 'border-l-2 border-transparent hover:bg-surface-200'"
           class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
           <div class="w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40
-                      flex items-center justify-center text-crimson text-sm font-bold flex-shrink-0">
-            {{ avatarLetter(conv.otherDisplayName) }}
+                      flex items-center justify-center text-crimson text-sm font-bold flex-shrink-0 overflow-hidden relative">
+            <span>{{ avatarLetter(conv.otherDisplayName) }}</span>
+            <img *ngIf="conv.otherProfilePictureUrl" [src]="conv.otherProfilePictureUrl"
+              class="absolute inset-0 w-full h-full object-cover"
+              onerror="this.style.display='none'" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-white text-sm font-medium truncate">{{ conv.otherDisplayName }}</p>
@@ -109,8 +112,11 @@
       <!-- Room avatar -->
       <div *ngIf="isDmRoom"
         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-crimson/20 border border-crimson/40
-               flex items-center justify-center text-crimson font-bold flex-shrink-0">
-        {{ avatarLetter(roomDisplayName) }}
+               flex items-center justify-center text-crimson font-bold flex-shrink-0 overflow-hidden relative">
+        <span>{{ avatarLetter(roomDisplayName) }}</span>
+        <img *ngIf="dmPartnerProfilePic" [src]="dmPartnerProfilePic"
+          class="absolute inset-0 w-full h-full object-cover"
+          onerror="this.style.display='none'" />
       </div>
       <div *ngIf="!isDmRoom"
         class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-300
@@ -149,11 +155,11 @@
         <!-- Other user avatar (left) -->
         <div *ngIf="msg.senderUsername !== currentUsername"
           class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
-                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden">
+                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden relative">
+          <span>{{ avatarLetter(msg.senderDisplayName) }}</span>
           <img *ngIf="msg.senderProfilePictureUrl" [src]="msg.senderProfilePictureUrl"
-            class="w-full h-full object-cover"
-            onerror="this.onerror=null;this.style.display='none'" />
-          <span *ngIf="!msg.senderProfilePictureUrl">{{ avatarLetter(msg.senderDisplayName) }}</span>
+            class="absolute inset-0 w-full h-full object-cover"
+            onerror="this.style.display='none'" />
         </div>
 
         <!-- Bubble -->
@@ -174,11 +180,11 @@
         <!-- Current user avatar (right) -->
         <div *ngIf="msg.senderUsername === currentUsername"
           class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-crimson/20 border border-crimson/40
-                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden">
+                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden relative">
+          <span>{{ avatarLetter(currentDisplayName) }}</span>
           <img *ngIf="currentProfilePicUrl" [src]="currentProfilePicUrl"
-            class="w-full h-full object-cover"
-            onerror="this.onerror=null;this.style.display='none'" />
-          <span *ngIf="!currentProfilePicUrl">{{ avatarLetter(currentDisplayName) }}</span>
+            class="absolute inset-0 w-full h-full object-cover"
+            onerror="this.style.display='none'" />
         </div>
       </div>
     </div>

@@ -117,6 +117,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     return this.roomId.charAt(0).toUpperCase() + this.roomId.slice(1);
   }
 
+  get dmPartnerProfilePic(): string | null {
+    if (!this.isDmRoom) return null;
+    return this.personalConversations.find(c => c.roomId === this.roomId)?.otherProfilePictureUrl ?? null;
+  }
+
   navigateToRoom(roomId: string): void {
     this.sidebarOpen = false;
     if (roomId !== this.roomId) {
