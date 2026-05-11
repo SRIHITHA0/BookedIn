@@ -127,25 +127,25 @@ public class DataSeeder {
 
             java.util.Map<String, String> extra = new java.util.LinkedHashMap<>();
             extra.put("The Alchemist",                        "https://covers.openlibrary.org/b/id/7414780-L.jpg");
-            extra.put("To Kill a Mockingbird",                "https://covers.openlibrary.org/b/id/12784310-L.jpg");
-            extra.put("1984",                                  "https://covers.openlibrary.org/b/id/9267242-L.jpg");
-            extra.put("Harry Potter and the Sorcerer's Stone", "https://covers.openlibrary.org/b/id/276518-L.jpg");
-            extra.put("The Da Vinci Code",                    "https://covers.openlibrary.org/b/id/9255229-L.jpg");
-            extra.put("Dune",                                  "https://covers.openlibrary.org/b/id/11481354-L.jpg");
-            extra.put("The Hunger Games",                     "https://covers.openlibrary.org/b/id/12646537-L.jpg");
-            extra.put("The Girl with the Dragon Tattoo",      "https://covers.openlibrary.org/b/id/9274740-L.jpg");
+            extra.put("To Kill a Mockingbird",                "https://cdn2.penguin.com.au/covers/original/9781784870799.jpg");
+            extra.put("1984",                                  "https://m.media-amazon.com/images/I/81qZ5kGMQ1L.jpg");
+            extra.put("Harry Potter and the Sorcerer's Stone", "https://images.squarespace-cdn.com/content/v1/58c180edff7c50dd0e51a2ad/1570651802069-75DYDA5NS7K8AQS79MCO/Harry-Potter-and-the-Sorcerers-Stone-Book-Cover-1024x1473.jpg");
+            extra.put("The Da Vinci Code",                    "https://images-na.ssl-images-amazon.com/images/S/compressed.photo.goodreads.com/books/1720313229i/968.jpg");
+            extra.put("Dune",                                  "https://m.media-amazon.com/images/I/81nq+ewtkcL.jpg");
+            extra.put("The Hunger Games",                     "https://m.media-amazon.com/images/I/71jagxetc9L._SL1500_.jpg");
+            extra.put("The Girl with the Dragon Tattoo",      "https://www.bookgeeks.in/wp-content/uploads/2017/04/the-girl-with-the-dragon-tattoo.jpg");
             extra.put("The Kite Runner",                      "https://covers.openlibrary.org/b/id/14846827-L.jpg");
-            extra.put("Norwegian Wood",                       "https://covers.openlibrary.org/b/id/2237620-L.jpg");
-            extra.put("Brave New World",                      "https://covers.openlibrary.org/b/id/8231823-L.jpg");
-            extra.put("The Road",                             "https://covers.openlibrary.org/b/id/198120-L.jpg");
-            extra.put("Life of Pi",                           "https://covers.openlibrary.org/b/id/12840573-L.jpg");
-            extra.put("The Fault in Our Stars",               "https://covers.openlibrary.org/b/id/7418786-L.jpg");
-            extra.put("Becoming",                             "https://covers.openlibrary.org/b/isbn/9781524763138-L.jpg");
-            extra.put("Think and Grow Rich",                  "https://covers.openlibrary.org/b/id/14542536-L.jpg");
-            extra.put("The Power of Now",                     "https://covers.openlibrary.org/b/id/551262-L.jpg");
-            extra.put("Rich Dad Poor Dad",                    "https://covers.openlibrary.org/b/id/8315603-L.jpg");
-            extra.put("The Body Keeps the Score",             "https://covers.openlibrary.org/b/id/8315367-L.jpg");
-            extra.put("The Seven Husbands of Evelyn Hugo",    "https://covers.openlibrary.org/b/id/8354226-L.jpg");
+            extra.put("Norwegian Wood",                       "https://tse3.mm.bing.net/th/id/OIP.Ofc3MomsBv95cnNKO5AShAHaLS?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3");
+            extra.put("Brave New World",                      "https://i.pinimg.com/originals/93/8b/a3/938ba3ce350426d147599c207d8fbb8b.png");
+            extra.put("The Road",                             "https://tse2.mm.bing.net/th/id/OIP.XJbME-F2Hue45-N34msmsgAAAA?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3");
+            extra.put("Life of Pi",                           "https://images.thenile.io/r1000/9781786894243.jpg");
+            extra.put("The Fault in Our Stars",               "https://tse4.mm.bing.net/th/id/OIP.TF1ylGg05itN8KD5u17i5gHaMW?rs=1&pid=ImgDetMain&o=7&rm=3");
+            extra.put("Becoming",                             "https://cdn2.penguin.com.au/covers/original/9780241334140.jpg");
+            extra.put("Think and Grow Rich",                  "https://tse4.mm.bing.net/th/id/OIP.XRRG_S7h6PW-cT3fdtHgEwHaLQ?o=7rm=3&rs=1&pid=ImgDetMain&o=7&rm=3");
+            extra.put("The Power of Now",                     "https://m.media-amazon.com/images/I/71-zqlETKcL._SL1500_.jpg");
+            extra.put("Rich Dad Poor Dad",                    "https://cdn.penguin.co.in/wp-content/uploads/2023/12/9781612681139-1-scaled.jpg");
+            extra.put("The Body Keeps the Score",             "https://m.media-amazon.com/images/I/71Ha3OShqSL._SL1500_.jpg");
+            extra.put("The Seven Husbands of Evelyn Hugo",    "https://d28hgpri8am2if.cloudfront.net/book_images/onix/cvr9781761102943/the-seven-husbands-of-evelyn-hugo-9781761102943_hr.jpg");
 
             if (!existingTitles.contains("The Alchemist"))
                 extraBooks.add(new Book("The Alchemist", "Paulo Coelho", "9780062315007",
