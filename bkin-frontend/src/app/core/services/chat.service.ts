@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Client, IMessage } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
 import { Observable, Subject } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { ChatMessage } from '../../models/chat-message.model';
 
@@ -22,6 +23,11 @@ export class ChatService {
   private messageSubject = new Subject<ChatMessage>();
 
   constructor(private http: HttpClient) {}
+
+  private resolveAvatar(url: string | null | undefined): string | null {
+    if (!url) return null;
+    return url.startsWith('/api/') ? `${environment.apiUrl}${url}` : url;
+  }
 
   connect(roomId: string): Observable<ChatMessage> {
     // Clean up any existing connection
@@ -46,7 +52,7 @@ export class ChatService {
               type:                     raw.type ?? 'TEXT',
               senderUsername:           raw.senderUsername,
               senderDisplayName:        raw.senderDisplayName,
-              senderProfilePictureUrl:  raw.senderProfilePictureUrl ?? null,
+              senderProfilePictureUrl:  this.resolveAvatar(raw.senderProfilePictureUrl),
               sentAt:                   raw.sentAt
             };
             this.messageSubject.next(chatMsg);
@@ -71,7 +77,9 @@ export class ChatService {
   }
 
   getHistory(roomId: string): Observable<ChatMessage[]> {
-    return this.http.get<ChatMessage[]>(`${environment.apiUrl}/api/chat/${roomId}/history`);
+    return this.http.get<ChatMessage[]>(`${environment.apiUrl}/api/chat/${roomId}/history`).pipe(
+      map(msgs => msgs.map(m => ({ ...m, senderProfilePictureUrl: this.resolveAvatar(m.senderProfilePictureUrl) })))
+    );
   }
 
   getRooms(): Observable<string[]> {
@@ -79,7 +87,9 @@ export class ChatService {
   }
 
   getPersonalConversations(): Observable<Conversation[]> {
-    return this.http.get<Conversation[]>(`${environment.apiUrl}/api/chat/personal/conversations`);
+    return this.http.get<Conversation[]>(`${environment.apiUrl}/api/chat/personal/conversations`).pipe(
+      map(convs => convs.map(c => ({ ...c, otherProfilePictureUrl: this.resolveAvatar(c.otherProfilePictureUrl) })))
+    );
   }
 
   disconnect(): void {

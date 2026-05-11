@@ -7,11 +7,14 @@ import com.cts.mfrp.bkin.entity.User;
 import com.cts.mfrp.bkin.repository.GenreRepository;
 import com.cts.mfrp.bkin.repository.UserRepository;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Base64;
 import java.util.Set;
 
 @RestController
@@ -40,6 +43,30 @@ public class UserController {
         User user = userRepository.findByUsernameWithInterests(username)
             .orElseThrow(() -> new RuntimeException("User not found"));
         return ResponseEntity.ok(UserProfileDto.from(user));
+    }
+
+    @GetMapping("/{username}/avatar")
+    public ResponseEntity<byte[]> getAvatar(@PathVariable String username) {
+        User user = userRepository.findByUsername(username).orElse(null);
+        if (user == null || user.getProfilePictureUrl() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        String raw = user.getProfilePictureUrl();
+        if (!raw.startsWith("data:")) {
+            return ResponseEntity.notFound().build();
+        }
+        try {
+            int comma = raw.indexOf(',');
+            String meta = raw.substring(5, comma);          // e.g. "image/png;base64"
+            String mimeType = meta.split(";")[0];            // e.g. "image/png"
+            byte[] bytes = Base64.getDecoder().decode(raw.substring(comma + 1));
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.parseMediaType(mimeType));
+            headers.setCacheControl("public, max-age=86400");
+            return ResponseEntity.ok().headers(headers).body(bytes);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
     @PutMapping("/me")

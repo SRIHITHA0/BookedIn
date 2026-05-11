@@ -17,7 +17,9 @@ public class ReviewResponseDto {
         ReviewResponseDto dto = new ReviewResponseDto();
         dto.username = ub.getUser().getUsername();
         dto.displayName = ub.getUser().getDisplayName();
-        dto.profilePictureUrl = ub.getUser().getProfilePictureUrl();
+        dto.profilePictureUrl = ub.getUser().getProfilePictureUrl() != null
+            ? "/api/users/" + ub.getUser().getUsername() + "/avatar"
+            : null;
         dto.rating = ub.getRating();
         dto.review = ub.getReview();
         dto.addedAt = ub.getAddedAt().toString();

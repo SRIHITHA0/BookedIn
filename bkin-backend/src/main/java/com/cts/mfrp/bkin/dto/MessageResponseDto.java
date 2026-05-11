@@ -21,7 +21,9 @@ public class MessageResponseDto {
         dto.senderDisplayName = msg.getSender().getDisplayName() != null
             ? msg.getSender().getDisplayName()
             : msg.getSender().getUsername();
-        dto.senderProfilePictureUrl = msg.getSender().getProfilePictureUrl();
+        dto.senderProfilePictureUrl = msg.getSender().getProfilePictureUrl() != null
+            ? "/api/users/" + msg.getSender().getUsername() + "/avatar"
+            : null;
         dto.content = msg.getContent();
         dto.type = msg.getMessageType().name();
         dto.sentAt = msg.getSentAt().toString() + "Z";

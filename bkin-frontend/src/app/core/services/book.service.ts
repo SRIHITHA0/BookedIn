@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
-import { catchError } from 'rxjs/operators';
+import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
 import { Book, Genre, UserBookStatus } from '../../models/book.model';
 
@@ -45,6 +45,11 @@ export interface CommunityReview {
 export class BookService {
 
   private readonly apiUrl = `${environment.apiUrl}/api/books`;
+
+  private resolveAvatar(url: string | null): string | null {
+    if (!url) return null;
+    return url.startsWith('/api/') ? `${environment.apiUrl}${url}` : url;
+  }
 
   constructor(private http: HttpClient) {}
 
@@ -99,7 +104,9 @@ export class BookService {
   }
 
   getBookReviews(bookId: number): Observable<ReviewResponse[]> {
-    return this.http.get<ReviewResponse[]>(`${environment.apiUrl}/api/reviews/book/${bookId}`);
+    return this.http.get<ReviewResponse[]>(`${environment.apiUrl}/api/reviews/book/${bookId}`).pipe(
+      map(reviews => reviews.map(r => ({ ...r, profilePictureUrl: this.resolveAvatar(r.profilePictureUrl) })))
+    );
   }
 
   deleteReview(bookId: number): Observable<void> {
@@ -111,6 +118,8 @@ export class BookService {
   }
 
   getRecentCommunityReviews(): Observable<CommunityReview[]> {
-    return this.http.get<CommunityReview[]>(`${environment.apiUrl}/api/reviews/recent`);
+    return this.http.get<CommunityReview[]>(`${environment.apiUrl}/api/reviews/recent`).pipe(
+      map(reviews => reviews.map(r => ({ ...r, profilePictureUrl: this.resolveAvatar(r.profilePictureUrl) })))
+    );
   }
 }
