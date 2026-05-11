@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DecimalPipe, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
@@ -13,6 +13,8 @@ import { Book } from '../../models/book.model';
   templateUrl: './book-details.component.html'
 })
 export class BookDetailsComponent implements OnInit {
+
+  @ViewChild('reviewFormSection') reviewFormSection!: ElementRef;
 
   book:          Book | null = null;
   isLoading      = false;
@@ -88,11 +90,16 @@ export class BookDetailsComponent implements OnInit {
     if (!this.book || this.userRating === 0) return;
     this.bookService.submitReview(this.book.id, this.userRating, this.userReview).subscribe({
       next: () => {
+        this.userReview = '';
         this.reviewSuccess = true;
         setTimeout(() => this.reviewSuccess = false, 3000);
         this.loadReviews(this.book!.id);
       }
     });
+  }
+
+  scrollToReviewForm(): void {
+    this.reviewFormSection?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
 
   deleteReview(): void {

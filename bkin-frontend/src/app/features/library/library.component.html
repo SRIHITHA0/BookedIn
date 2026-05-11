@@ -3,18 +3,13 @@
   <!-- ═══════════ NAVBAR ═══════════ -->
   <nav class="sticky top-0 z-50 bg-surface-100/80 backdrop-blur-md border-b border-surface-300">
     <div class="max-w-7xl mx-auto px-4 sm:px-6">
-      <div class="flex items-center h-14 sm:h-16 gap-2 sm:gap-3">
+      <div class="flex items-center h-16 sm:h-20 gap-2 sm:gap-3">
 
         <!-- Logo -->
         <a routerLink="/home" class="flex items-center gap-2 flex-shrink-0 hover:opacity-80 transition-opacity">
-          <img src="assets/bookedin_logo_transparent.png" alt="" class="h-7 sm:h-8 w-auto" />
+          <img src="assets/bookedin_logo_transparent.png" alt="" class="h-9 sm:h-11 w-auto" />
           <span class="text-crimson text-lg sm:text-xl font-extrabold tracking-tight hidden sm:inline">BookedIn</span>
         </a>
-
-        <!-- Library title -->
-        <div class="hidden sm:flex items-center flex-shrink-0">
-          <span class="text-white text-sm font-semibold">Library</span>
-        </div>
 
         <!-- Search bar (flex-1) -->
         <div class="flex-1 relative min-w-0">
@@ -43,8 +38,8 @@
 
           <!-- Chat -->
           <button (click)="openChat()"
-            class="hidden sm:flex text-gray-400 hover:text-white text-sm transition-colors items-center gap-1.5
-                   border border-surface-300 hover:border-crimson/50 rounded-lg px-2.5 py-1.5">
+            class="hidden sm:flex text-gray-400 hover:text-white text-sm transition-colors items-center gap-2
+                   border border-surface-300 hover:border-crimson/50 rounded-lg px-3.5 py-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
@@ -54,8 +49,8 @@
 
           <!-- My Shelf -->
           <a routerLink="/shelf"
-            class="hidden sm:flex text-gray-400 hover:text-white text-sm transition-colors items-center gap-1.5
-                   border border-surface-300 hover:border-crimson/50 rounded-lg px-2.5 py-1.5">
+            class="hidden sm:flex text-gray-400 hover:text-white text-sm transition-colors items-center gap-2
+                   border border-surface-300 hover:border-crimson/50 rounded-lg px-3.5 py-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
@@ -65,7 +60,7 @@
 
           <!-- Profile avatar -->
           <a routerLink="/profile"
-            class="w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
+            class="w-10 h-10 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
                    text-crimson text-sm font-bold hover:bg-crimson/30 transition-colors flex-shrink-0 overflow-hidden">
             <img *ngIf="myProfilePicUrl" [src]="myProfilePicUrl"
               class="w-full h-full object-cover"

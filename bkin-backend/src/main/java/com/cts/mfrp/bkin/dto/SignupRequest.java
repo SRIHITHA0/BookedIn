@@ -22,6 +22,9 @@ public class SignupRequest {
     private String displayName;
 
     private List<String> interests;
+    private String dateOfBirth;
+    private String gender;
+    private String country;
 
     public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
@@ -33,4 +36,10 @@ public class SignupRequest {
     public void setDisplayName(String displayName) { this.displayName = displayName; }
     public List<String> getInterests() { return interests; }
     public void setInterests(List<String> interests) { this.interests = interests; }
+    public String getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
 }

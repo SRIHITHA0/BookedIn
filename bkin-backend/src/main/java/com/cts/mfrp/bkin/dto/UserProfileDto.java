@@ -11,6 +11,9 @@ public class UserProfileDto {
     private String profilePictureUrl;
     private List<String> interests;
     private String createdAt;
+    private String dateOfBirth;
+    private String gender;
+    private String country;
 
     public static UserProfileDto from(User user) {
         UserProfileDto dto = new UserProfileDto();
@@ -21,6 +24,9 @@ public class UserProfileDto {
         dto.profilePictureUrl = user.getProfilePictureUrl();
         dto.interests = user.getInterests().stream().map(g -> g.getName()).toList();
         dto.createdAt = user.getCreatedAt().toString();
+        dto.dateOfBirth = user.getDateOfBirth() != null ? user.getDateOfBirth().toString() : null;
+        dto.gender = user.getGender();
+        dto.country = user.getCountry();
         return dto;
     }
 
@@ -31,4 +37,7 @@ public class UserProfileDto {
     public String getProfilePictureUrl() { return profilePictureUrl; }
     public List<String> getInterests() { return interests; }
     public String getCreatedAt() { return createdAt; }
+    public String getDateOfBirth() { return dateOfBirth; }
+    public String getGender() { return gender; }
+    public String getCountry() { return country; }
 }

@@ -93,6 +93,45 @@
           </span>
         </div>
 
+        <!-- Date of Birth + Gender row -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Date of Birth</label>
+            <input type="date" formControlName="dateOfBirth" [max]="maxDob"
+              class="bkin-input" />
+            <span *ngIf="f['dateOfBirth'].invalid && f['dateOfBirth'].touched" class="bkin-error">
+              Date of birth is required.
+            </span>
+          </div>
+          <div>
+            <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Gender</label>
+            <div class="flex flex-wrap gap-x-4 gap-y-2 mt-1">
+              <label *ngFor="let g of genderOptions"
+                class="flex items-center gap-2 cursor-pointer text-gray-400 text-sm hover:text-white transition-colors">
+                <input type="radio" formControlName="gender" [value]="g"
+                  class="accent-crimson w-4 h-4 cursor-pointer" />
+                {{ g }}
+              </label>
+            </div>
+            <span *ngIf="f['gender'].invalid && f['gender'].touched" class="bkin-error">
+              Please select a gender.
+            </span>
+          </div>
+        </div>
+
+        <!-- Country -->
+        <div>
+          <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Country</label>
+          <select formControlName="country"
+            class="bkin-input appearance-none cursor-pointer">
+            <option value="" disabled selected class="bg-surface-200">Select your country</option>
+            <option *ngFor="let c of countries" [value]="c" class="bg-surface-200">{{ c }}</option>
+          </select>
+          <span *ngIf="f['country'].invalid && f['country'].touched" class="bkin-error">
+            Please select a country.
+          </span>
+        </div>
+
         <!-- Interest Tags -->
         <div>
           <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-2">Select Your Interests</label>

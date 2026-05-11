@@ -91,7 +91,7 @@
         </div>
 
         <!-- Write a Review Form -->
-        <div class="bg-surface-100 border border-surface-300 rounded-xl p-6">
+        <div #reviewFormSection class="bg-surface-100 border border-surface-300 rounded-xl p-6">
           <h3 class="text-white text-base font-semibold mb-4">
             {{ userRating > 0 ? 'Your Review' : 'Leave a Review' }}
           </h3>
@@ -189,9 +189,17 @@
               Let's Connect
             </button>
 
-            <!-- Own review: delete -->
-            <span *ngIf="review.username === currentUsername"
-              class="text-xs text-gray-500 bg-surface-200 rounded px-2 py-0.5">Your review</span>
+            <!-- Own review: edit button -->
+            <button *ngIf="review.username === currentUsername"
+              (click)="scrollToReviewForm()"
+              class="flex items-center gap-1.5 text-xs text-crimson border border-crimson/40
+                     hover:bg-crimson/10 rounded-lg px-3 py-1.5 transition-all">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+              </svg>
+              Edit Review
+            </button>
           </div>
         </div>
       </div>

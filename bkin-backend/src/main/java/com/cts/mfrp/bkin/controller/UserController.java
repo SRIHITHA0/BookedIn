@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.time.LocalDate;
 import java.util.Base64;
 import java.util.Set;
 
@@ -79,6 +80,10 @@ public class UserController {
         if (request.getDisplayName() != null) user.setDisplayName(request.getDisplayName());
         if (request.getBio() != null) user.setBio(request.getBio());
         if (request.getProfilePictureUrl() != null) user.setProfilePictureUrl(request.getProfilePictureUrl());
+        if (request.getDateOfBirth() != null && !request.getDateOfBirth().isBlank())
+            user.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
+        if (request.getGender() != null) user.setGender(request.getGender());
+        if (request.getCountry() != null) user.setCountry(request.getCountry());
 
         if (request.getInterests() != null && !request.getInterests().isEmpty()) {
             Set<Genre> genres = genreRepository.findByNameIn(request.getInterests());

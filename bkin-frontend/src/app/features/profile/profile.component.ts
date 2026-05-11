@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { UserService, UserProfile, ShelfItem } from '../../core/services/user.service';
@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],
+  imports: [CommonModule, ReactiveFormsModule, RouterModule, DatePipe],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit {
@@ -16,6 +16,7 @@ export class ProfileComponent implements OnInit {
   profile:       UserProfile | null = null;
   profileForm:   FormGroup;
   isEditing      = false;
+  isLoading      = true;
   isSaving       = false;
   saveSuccess    = false;
   errorMessage   = '';
@@ -30,6 +31,21 @@ export class ProfileComponent implements OnInit {
   ];
   selectedInterests: string[] = [];
 
+  readonly genderOptions = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+
+  readonly countries = [
+    'Afghanistan','Argentina','Australia','Austria','Bangladesh','Belgium','Brazil','Canada',
+    'Chile','China','Colombia','Czech Republic','Denmark','Egypt','Ethiopia','Finland',
+    'France','Germany','Ghana','Greece','Hungary','India','Indonesia','Iran','Iraq',
+    'Ireland','Israel','Italy','Japan','Kenya','Malaysia','Mexico','Morocco','Netherlands',
+    'New Zealand','Nigeria','Norway','Pakistan','Philippines','Poland','Portugal','Romania',
+    'Russia','Saudi Arabia','Singapore','South Africa','South Korea','Spain','Sweden',
+    'Switzerland','Tanzania','Thailand','Turkey','Uganda','Ukraine',
+    'United Arab Emirates','United Kingdom','United States','Vietnam'
+  ];
+
+  readonly maxDob = new Date().toISOString().split('T')[0];
+
   uploadingImage = false;
 
   constructor(
@@ -41,7 +57,10 @@ export class ProfileComponent implements OnInit {
     this.profileForm = this.fb.group({
       displayName:       ['', [Validators.required, Validators.maxLength(100)]],
       bio:               [''],
-      profilePictureUrl: ['']
+      profilePictureUrl: [''],
+      dateOfBirth:       [''],
+      gender:            [''],
+      country:           ['']
     });
   }
 
@@ -51,7 +70,9 @@ export class ProfileComponent implements OnInit {
         this.profile = p;
         this.selectedInterests = [...p.interests];
         this.patchForm(p);
-      }
+        this.isLoading = false;
+      },
+      error: () => { this.isLoading = false; }
     });
     this.userService.getMyShelf().subscribe({
       next: (items: ShelfItem[]) => {
@@ -66,12 +87,16 @@ export class ProfileComponent implements OnInit {
     this.profileForm.patchValue({
       displayName:       p.displayName ?? '',
       bio:               p.bio ?? '',
-      profilePictureUrl: p.profilePictureUrl ?? ''
+      profilePictureUrl: p.profilePictureUrl ?? '',
+      dateOfBirth:       p.dateOfBirth ?? '',
+      gender:            p.gender ?? '',
+      country:           p.country ?? ''
     });
   }
 
   toggleEdit(): void {
     this.isEditing = !this.isEditing;
+    this.errorMessage = '';
     if (!this.isEditing && this.profile) this.patchForm(this.profile);
   }
 

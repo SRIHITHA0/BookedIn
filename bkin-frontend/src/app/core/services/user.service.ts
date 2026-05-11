@@ -11,6 +11,9 @@ export interface UserProfile {
   profilePictureUrl: string;
   interests: string[];
   createdAt: string;
+  dateOfBirth?: string | null;
+  gender?: string | null;
+  country?: string | null;
 }
 
 export interface UpdateProfilePayload {

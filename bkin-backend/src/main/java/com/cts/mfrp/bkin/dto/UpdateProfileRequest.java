@@ -12,6 +12,9 @@ public class UpdateProfileRequest {
 
     private String profilePictureUrl;
     private List<String> interests;
+    private String dateOfBirth;
+    private String gender;
+    private String country;
 
     public String getDisplayName() { return displayName; }
     public void setDisplayName(String displayName) { this.displayName = displayName; }
@@ -21,4 +24,10 @@ public class UpdateProfileRequest {
     public void setProfilePictureUrl(String profilePictureUrl) { this.profilePictureUrl = profilePictureUrl; }
     public List<String> getInterests() { return interests; }
     public void setInterests(List<String> interests) { this.interests = interests; }
+    public String getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(String dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
 }

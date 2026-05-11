@@ -24,17 +24,34 @@ export class SignupComponent implements OnInit {
   ];
   selectedGenres: string[] = [];
 
+  readonly genderOptions = ['Male', 'Female', 'Non-binary', 'Prefer not to say'];
+
+  readonly countries = [
+    'Afghanistan','Argentina','Australia','Austria','Bangladesh','Belgium','Brazil','Canada',
+    'Chile','China','Colombia','Czech Republic','Denmark','Egypt','Ethiopia','Finland',
+    'France','Germany','Ghana','Greece','Hungary','India','Indonesia','Iran','Iraq',
+    'Ireland','Israel','Italy','Japan','Kenya','Malaysia','Mexico','Morocco','Netherlands',
+    'New Zealand','Nigeria','Norway','Pakistan','Philippines','Poland','Portugal','Romania',
+    'Russia','Saudi Arabia','Singapore','South Africa','South Korea','Spain','Sweden',
+    'Switzerland','Tanzania','Thailand','Turkey','Uganda','Ukraine',
+    'United Arab Emirates','United Kingdom','United States','Vietnam'
+  ];
+
+  readonly maxDob = new Date().toISOString().split('T')[0];
+
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router
   ) {
-    // Initialize in constructor so formGroup is never undefined when template renders
     this.signupForm = this.fb.group({
-      displayName: ['', [Validators.required, Validators.maxLength(100)]],
-      username:    ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
-      email:       ['', [Validators.required, Validators.email]],
-      password:    ['', [Validators.required, Validators.minLength(8)]]
+      displayName:  ['', [Validators.required, Validators.maxLength(100)]],
+      username:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      email:        ['', [Validators.required, Validators.email]],
+      password:     ['', [Validators.required, Validators.minLength(8)]],
+      dateOfBirth:  ['', Validators.required],
+      gender:       ['', Validators.required],
+      country:      ['', Validators.required]
     });
   }
 

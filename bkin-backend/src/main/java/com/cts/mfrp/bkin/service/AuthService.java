@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Service
@@ -51,6 +52,10 @@ public class AuthService {
             Set<Genre> genres = genreRepository.findByNameIn(request.getInterests());
             user.setInterests(genres);
         }
+        if (request.getDateOfBirth() != null && !request.getDateOfBirth().isBlank())
+            user.setDateOfBirth(LocalDate.parse(request.getDateOfBirth()));
+        if (request.getGender() != null) user.setGender(request.getGender());
+        if (request.getCountry() != null) user.setCountry(request.getCountry());
 
         userRepository.save(user);
 

@@ -1,6 +1,7 @@
 package com.cts.mfrp.bkin.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashSet;
 import java.util.Set;
@@ -30,6 +31,15 @@ public class User {
 
     @Column(name = "profile_picture_url", columnDefinition = "LONGTEXT")
     private String profilePictureUrl;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    @Column(length = 50)
+    private String gender;
+
+    @Column(length = 100)
+    private String country;
 
     @Column(name = "is_active")
     private Boolean isActive = true;
@@ -68,6 +78,12 @@ public class User {
     public void setIsActive(Boolean isActive) { this.isActive = isActive; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public LocalDate getDateOfBirth() { return dateOfBirth; }
+    public void setDateOfBirth(LocalDate dateOfBirth) { this.dateOfBirth = dateOfBirth; }
+    public String getGender() { return gender; }
+    public void setGender(String gender) { this.gender = gender; }
+    public String getCountry() { return country; }
+    public void setCountry(String country) { this.country = country; }
     public Set<Genre> getInterests() { return interests; }
     public void setInterests(Set<Genre> interests) { this.interests = interests; }
 }
