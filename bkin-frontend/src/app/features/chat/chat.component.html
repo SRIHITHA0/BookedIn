@@ -1,16 +1,13 @@
 <div class="h-screen bg-obsidian flex overflow-hidden relative">
 
-  <!-- ═══ MOBILE SIDEBAR OVERLAY ═══ -->
   <div *ngIf="sidebarOpen"
-    class="fixed inset-0 z-30 bg-black/60 lg:hidden"
-    (click)="sidebarOpen = false"></div>
+       class="fixed inset-0 z-30 bg-black/60 lg:hidden"
+       (click)="sidebarOpen = false"></div>
 
-  <!-- ═══ LEFT SIDEBAR ═══ -->
   <div [ngClass]="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
-    class="fixed lg:relative z-40 lg:z-auto w-72 h-full flex-shrink-0 bg-surface-100 border-r border-surface-300
+       class="fixed lg:relative z-40 lg:z-auto w-72 h-full flex-shrink-0 bg-surface-100 border-r border-surface-300
            flex flex-col transition-transform duration-300 ease-in-out">
 
-    <!-- Sidebar Header -->
     <div class="px-4 py-4 border-b border-surface-300 flex items-center justify-between">
       <a routerLink="/home" class="text-gray-400 hover:text-crimson transition-colors flex items-center gap-2 text-sm">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -22,7 +19,6 @@
         <img src="assets/bookedin_logo_transparent.png" alt="" class="h-6 w-auto" />
         <span class="text-crimson font-extrabold tracking-tight">BookedIn</span>
       </a>
-      <!-- Mobile close button -->
       <button (click)="sidebarOpen = false" class="lg:hidden p-1 text-gray-500 hover:text-white transition-colors ml-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -30,39 +26,36 @@
       </button>
     </div>
 
-    <!-- Scrollable sidebar content -->
     <div class="flex-1 overflow-y-auto">
 
-      <!-- Group Chats -->
       <div class="px-3 pt-4 pb-2">
         <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2 px-2">Group Chats</p>
         <button *ngFor="let room of groupRooms" (click)="navigateToRoom(room)"
-          [ngClass]="roomId === room
+                [ngClass]="roomId === room
             ? 'bg-crimson/15 text-white border-l-2 border-crimson'
             : 'text-gray-400 hover:bg-surface-200 hover:text-white border-l-2 border-transparent'"
-          class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
-          <span class="text-sm capitalize">{{ room }}</span>
+                class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
+          <span *ngIf="room === 'ai-bot-room'" class="text-xs">👻</span>
+          <span class="text-sm capitalize">{{ room === 'ai-bot-room' ? 'The Library Ghost' : room }}</span>
         </button>
       </div>
 
-      <!-- Personal -->
       <div class="px-3 pt-3 pb-4">
         <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2 px-2">Personal</p>
 
-        <!-- Personal search bar -->
         <div class="relative mb-2">
           <input type="text" [(ngModel)]="personalSearchQuery"
-            placeholder="Search conversations..."
-            class="w-full bg-surface-200 border border-surface-300 text-white placeholder-gray-600
+                 placeholder="Search conversations..."
+                 class="w-full bg-surface-200 border border-surface-300 text-white placeholder-gray-600
                    rounded-lg px-3 py-1.5 text-xs focus:outline-none focus:border-crimson transition-all pr-7" />
           <svg *ngIf="!personalSearchQuery" xmlns="http://www.w3.org/2000/svg"
-            class="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+               class="h-3.5 w-3.5 absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 pointer-events-none"
+               fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
           </svg>
           <button *ngIf="personalSearchQuery" (click)="personalSearchQuery = ''"
-            class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
+                  class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
             </svg>
@@ -70,22 +63,22 @@
         </div>
 
         <p *ngIf="personalConversations.length === 0"
-          class="text-gray-600 text-xs px-2 italic leading-relaxed">
+           class="text-gray-600 text-xs px-2 italic leading-relaxed">
           No conversations yet.<br/>Use "Let's Connect" on book reviews.
         </p>
         <p *ngIf="personalConversations.length > 0 && filteredPersonalConversations.length === 0"
-          class="text-gray-600 text-xs px-2 italic">No results found.</p>
+           class="text-gray-600 text-xs px-2 italic">No results found.</p>
         <button *ngFor="let conv of filteredPersonalConversations" (click)="navigateToRoom(conv.roomId)"
-          [ngClass]="roomId === conv.roomId
+                [ngClass]="roomId === conv.roomId
             ? 'bg-crimson/15 border-l-2 border-crimson'
             : 'border-l-2 border-transparent hover:bg-surface-200'"
-          class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
+                class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
           <div class="w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40
                       flex items-center justify-center text-crimson text-sm font-bold flex-shrink-0 overflow-hidden relative">
             <span>{{ avatarLetter(conv.otherDisplayName) }}</span>
             <img *ngIf="conv.otherProfilePictureUrl" [src]="conv.otherProfilePictureUrl"
-              class="absolute inset-0 w-full h-full object-cover"
-              onerror="this.style.display='none'" />
+                 class="absolute inset-0 w-full h-full object-cover"
+                 onerror="this.style.display='none'" />
           </div>
           <div class="flex-1 min-w-0">
             <p class="text-white text-sm font-medium truncate">{{ conv.otherDisplayName }}</p>
@@ -96,43 +89,37 @@
     </div>
   </div>
 
-  <!-- ═══ RIGHT PANE ═══ -->
   <div class="flex-1 flex flex-col min-w-0">
 
-    <!-- Chat Header -->
     <div class="bg-surface-100 border-b border-surface-300 px-4 sm:px-6 py-3 sm:py-4 flex items-center gap-3 sm:gap-4 flex-shrink-0">
-      <!-- Mobile sidebar toggle -->
       <button (click)="sidebarOpen = true"
-        class="lg:hidden p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg flex-shrink-0">
+              class="lg:hidden p-1.5 text-gray-400 hover:text-white transition-colors rounded-lg flex-shrink-0">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
         </svg>
       </button>
 
-      <!-- Room avatar -->
       <div *ngIf="isDmRoom"
-        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-crimson/20 border border-crimson/40
+           class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-crimson/20 border border-crimson/40
                flex items-center justify-center text-crimson font-bold flex-shrink-0 overflow-hidden relative">
         <span>{{ avatarLetter(roomDisplayName) }}</span>
         <img *ngIf="dmPartnerProfilePic" [src]="dmPartnerProfilePic"
-          class="absolute inset-0 w-full h-full object-cover"
-          onerror="this.style.display='none'" />
+             class="absolute inset-0 w-full h-full object-cover"
+             onerror="this.style.display='none'" />
       </div>
       <div *ngIf="!isDmRoom"
-        class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-300
+           class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-300
                flex items-center justify-center text-base flex-shrink-0">
-        💬
+        {{ roomId === 'ai-bot-room' ? '👻' : '💬' }}
       </div>
       <div class="min-w-0">
         <h1 class="text-white font-semibold text-sm sm:text-base truncate">{{ roomDisplayName }}</h1>
-        <p class="text-gray-500 text-xs">{{ isDmRoom ? 'Private conversation' : 'Group discussion' }}</p>
+        <p class="text-gray-500 text-xs">{{ isDmRoom ? 'Private conversation' : (roomId === 'ai-bot-room' ? 'AI Assistant' : 'Group discussion') }}</p>
       </div>
     </div>
 
-    <!-- Messages Area -->
     <div #messageList class="flex-1 overflow-y-auto px-4 sm:px-6 py-4 sm:py-6 space-y-3">
 
-      <!-- Loading state -->
       <div *ngIf="isLoadingHistory" class="flex flex-col items-center justify-center h-full pb-16">
         <svg class="animate-spin h-7 w-7 text-crimson" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -140,35 +127,34 @@
         </svg>
       </div>
 
-      <!-- Empty state -->
       <div *ngIf="!isLoadingHistory && messages.length === 0"
-        class="flex flex-col items-center justify-center h-full text-center pb-16">
+           class="flex flex-col items-center justify-center h-full text-center pb-16">
         <p class="text-5xl mb-3">💬</p>
         <p class="text-gray-500 text-base">No messages yet.</p>
         <p class="text-gray-600 text-sm mt-1">Be the first to say something!</p>
       </div>
 
-      <!-- Message bubbles -->
       <div *ngFor="let msg of messages"
-        [ngClass]="msg.senderUsername === currentUsername ? 'flex justify-end items-end gap-2' : 'flex justify-start items-end gap-2'">
+           [ngClass]="msg.senderUsername === currentUsername ? 'flex justify-end items-end gap-2' : 'flex justify-start items-end gap-2'">
 
-        <!-- Other user avatar (left) -->
         <div *ngIf="msg.senderUsername !== currentUsername"
-          class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
+             class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
                  flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden relative">
-          <span>{{ avatarLetter(msg.senderDisplayName) }}</span>
-          <img *ngIf="msg.senderProfilePictureUrl" [src]="msg.senderProfilePictureUrl"
-            class="absolute inset-0 w-full h-full object-cover"
-            onerror="this.style.display='none'" />
+          <span *ngIf="msg.senderUsername === 'BookBot'">👻</span>
+          <span *ngIf="msg.senderUsername !== 'BookBot'">{{ avatarLetter(msg.senderDisplayName) }}</span>
+          <img *ngIf="msg.senderUsername !== 'BookBot' && msg.senderProfilePictureUrl" [src]="msg.senderProfilePictureUrl"
+               class="absolute inset-0 w-full h-full object-cover"
+               onerror="this.style.display='none'" />
         </div>
 
-        <!-- Bubble -->
-        <div [ngClass]="msg.senderUsername === currentUsername
-            ? 'bg-crimson text-white rounded-2xl rounded-br-sm max-w-[75%] sm:max-w-xs lg:max-w-md'
-            : 'bg-surface-200 text-white rounded-2xl rounded-bl-sm max-w-[75%] sm:max-w-xs lg:max-w-md'"
-          class="px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm">
+        <div [ngClass]="{
+            'bg-crimson text-white rounded-2xl rounded-br-sm': msg.senderUsername === currentUsername,
+            'bg-surface-200 text-white rounded-2xl rounded-bl-sm': msg.senderUsername !== currentUsername && msg.senderUsername !== 'BookBot',
+            'bg-obsidian border border-crimson shadow-[0_0_10px_rgba(220,20,60,0.3)] text-white rounded-2xl rounded-bl-sm': msg.senderUsername === 'BookBot'
+          }"
+             class="px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm max-w-[75%] sm:max-w-xs lg:max-w-md">
           <p *ngIf="msg.senderUsername !== currentUsername && !isDmRoom"
-            class="text-crimson text-[11px] font-semibold mb-1 leading-tight">
+             class="text-crimson text-[11px] font-semibold mb-1 leading-tight">
             {{ msg.senderDisplayName }}
           </p>
           <p class="text-sm leading-relaxed break-words">{{ msg.content }}</p>
@@ -177,21 +163,18 @@
           </p>
         </div>
 
-        <!-- Current user avatar (right) -->
         <div *ngIf="msg.senderUsername === currentUsername"
-          class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-crimson/20 border border-crimson/40
+             class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-crimson/20 border border-crimson/40
                  flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden relative">
           <span>{{ avatarLetter(currentDisplayName) }}</span>
           <img *ngIf="currentProfilePicUrl" [src]="currentProfilePicUrl"
-            class="absolute inset-0 w-full h-full object-cover"
-            onerror="this.style.display='none'" />
+               class="absolute inset-0 w-full h-full object-cover"
+               onerror="this.style.display='none'" />
         </div>
       </div>
     </div>
 
-    <!-- Input Area -->
     <div class="bg-surface-100 border-t border-surface-300 px-3 sm:px-6 py-3 sm:py-4 flex-shrink-0">
-      <!-- Connecting indicator -->
       <div *ngIf="!chatService.connected" class="flex items-center gap-2 mb-2 text-xs text-gray-500">
         <svg class="animate-spin h-3 w-3 text-crimson" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
           <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -201,15 +184,15 @@
       </div>
       <div class="flex items-end gap-2 sm:gap-3 max-w-4xl mx-auto">
         <textarea [(ngModel)]="newMessage" (keydown)="onKeydown($event)"
-          [placeholder]="chatService.connected
+                  [placeholder]="chatService.connected
             ? (isDmRoom ? 'Message ' + roomDisplayName + '...' : 'Message... (Enter to send)')
             : 'Connecting...'"
-          [disabled]="!chatService.connected"
-          rows="1"
-          class="flex-1 bkin-input resize-none min-h-[40px] sm:min-h-[44px] max-h-32 leading-relaxed text-sm
+                  [disabled]="!chatService.connected"
+                  rows="1"
+                  class="flex-1 bkin-input resize-none min-h-[40px] sm:min-h-[44px] max-h-32 leading-relaxed text-sm
                  disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
         <button (click)="sendMessage()" [disabled]="!newMessage.trim() || !chatService.connected"
-          class="bg-crimson hover:bg-crimson-hover disabled:opacity-40 disabled:cursor-not-allowed
+                class="bg-crimson hover:bg-crimson-hover disabled:opacity-40 disabled:cursor-not-allowed
                  text-white rounded-xl p-2.5 sm:p-3 transition-all flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>

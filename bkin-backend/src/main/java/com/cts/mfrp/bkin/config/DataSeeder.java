@@ -8,6 +8,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -253,6 +255,7 @@ public class DataSeeder {
                 bookRepository.saveAll(extraBooks);
                 System.out.println("[BookedIn] Added " + extraBooks.size() + " new books.");
             }
+
         };
     }
 }
