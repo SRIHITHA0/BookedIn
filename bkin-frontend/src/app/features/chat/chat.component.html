@@ -28,15 +28,33 @@
 
     <div class="flex-1 overflow-y-auto">
 
-      <div class="px-3 pt-4 pb-2">
+      <!-- AI Assistant section -->
+      <div class="px-3 pt-4 pb-1">
+        <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2 px-2">AI Assistant</p>
+        <button (click)="navigateToRoom(aiRoom)"
+                [ngClass]="roomId === aiRoom
+            ? 'bg-crimson/15 text-white border-l-2 border-crimson'
+            : 'text-gray-400 hover:bg-surface-200 hover:text-white border-l-2 border-transparent'"
+                class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all">
+          <div class="w-8 h-8 rounded-full bg-surface-300 flex items-center justify-center text-base flex-shrink-0">
+            👻
+          </div>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium">The Library Ghost</p>
+            <p class="text-gray-600 text-xs">Your AI reading companion</p>
+          </div>
+        </button>
+      </div>
+
+      <!-- Group Chats section -->
+      <div class="px-3 pt-3 pb-2">
         <p class="text-gray-500 text-[10px] uppercase tracking-widest mb-2 px-2">Group Chats</p>
         <button *ngFor="let room of groupRooms" (click)="navigateToRoom(room)"
                 [ngClass]="roomId === room
             ? 'bg-crimson/15 text-white border-l-2 border-crimson'
             : 'text-gray-400 hover:bg-surface-200 hover:text-white border-l-2 border-transparent'"
                 class="w-full text-left flex items-center gap-3 px-3 py-2.5 rounded-r-lg transition-all mb-0.5">
-          <span *ngIf="room === 'ai-bot-room'" class="text-xs">👻</span>
-          <span class="text-sm capitalize">{{ room === 'ai-bot-room' ? 'The Library Ghost' : room }}</span>
+          <span class="text-sm capitalize">{{ room }}</span>
         </button>
       </div>
 

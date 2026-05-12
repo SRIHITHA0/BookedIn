@@ -23,8 +23,8 @@ public class AiChatService {
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    // Use the latest 2026 stable endpoint
-    private final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent";
+    // gemini-2.0-flash is stable and widely available
+    private final String API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent";
 
     /**
      * Creates a RestTemplate specifically configured to bypass the
@@ -80,7 +80,7 @@ public class AiChatService {
 
         } catch (Exception e) {
             e.printStackTrace();
-            return "The Ghost is currently trapped behind a spectral firewall (404/Connection Issue).";
+            return "*The Library Ghost flickers and whispers...* I seem to have lost my connection to the spirit realm. Please try again in a moment! (" + e.getClass().getSimpleName() + ")";
         }
     }
 }

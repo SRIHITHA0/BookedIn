@@ -34,8 +34,8 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   sidebarOpen = false;
   personalSearchQuery = '';
 
-  // Added 'ai-bot-room' to match the backend available rooms list
-  readonly groupRooms = ['general', 'fiction', 'mystery', 'sci-fi', 'fantasy', 'thriller', 'ai-bot-room'];
+  readonly groupRooms = ['general', 'fiction', 'mystery', 'sci-fi', 'fantasy', 'thriller'];
+  readonly aiRoom = 'ai-bot-room';
 
   get filteredPersonalConversations(): Conversation[] {
     const q = this.personalSearchQuery.trim().toLowerCase();
