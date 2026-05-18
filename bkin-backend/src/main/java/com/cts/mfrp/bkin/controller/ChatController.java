@@ -76,7 +76,7 @@ public class ChatController {
         // Each user has their own private AI room: ai_<username>
         if (roomId.startsWith("ai_")) {
             List<Book> libraryBooks = bookRepository.findAll();
-            String botResponse = aiChatService.getBotResponse(incoming.getContent(), libraryBooks);
+            String botResponse = aiChatService.getBotResponse(incoming.getContent(), libraryBooks, sender.getUsername());
 
             // Persist the bot response using the seeded BookBot user
             userRepository.findByUsername("BookBot").ifPresent(botUser -> {
