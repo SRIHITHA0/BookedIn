@@ -35,8 +35,21 @@ public class AuthService {
         this.authenticationManager = authenticationManager;
     }
 
-    @Transactional
     public AuthResponse signup(SignupRequest request) {
+        // Step 1: save the user in its own transaction — commits immediately on return
+        saveNewUser(request);
+
+        // Step 2: now the row is committed, authenticate safely
+        Authentication auth = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
+        );
+        User user = userRepository.findByUsername(request.getUsername())
+            .orElseThrow(() -> new RuntimeException("User not found after signup"));
+        return new AuthResponse(tokenProvider.generateToken(auth), user.getUsername(), user.getDisplayName());
+    }
+
+    @Transactional
+    public void saveNewUser(SignupRequest request) {
         if (userRepository.existsByUsername(request.getUsername()))
             throw new IllegalArgumentException("Username already taken");
         if (userRepository.existsByEmail(request.getEmail()))
@@ -58,11 +71,7 @@ public class AuthService {
         if (request.getCountry() != null) user.setCountry(request.getCountry());
 
         userRepository.save(user);
-
-        Authentication auth = authenticationManager.authenticate(
-            new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-        return new AuthResponse(tokenProvider.generateToken(auth), user.getUsername(), user.getDisplayName());
+        // @Transactional commits here — user is now visible to all transactions
     }
 
     public AuthResponse login(AuthRequest request) {
