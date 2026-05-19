@@ -5,8 +5,8 @@ import java.util.List;
 
 public class SignupRequest {
 
-    @NotBlank
-    @Size(min = 3, max = 50)
+    // username is no longer supplied by the user — it is auto-generated
+    // from displayName in AuthService.saveNewUser()
     private String username;
 
     @NotBlank

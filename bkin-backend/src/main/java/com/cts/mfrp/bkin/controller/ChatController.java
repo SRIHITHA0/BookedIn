@@ -257,11 +257,24 @@ public class ChatController {
                             : null);
                     dto.setLastMessage(lastMsg != null ? lastMsg.getContent() : "");
                     dto.setLastMessageAt(lastMsg != null ? lastMsg.getSentAt().toString() : "");
+                    dto.setUnreadCount((int) messageRepository.countUnreadInRoom(roomId, username));
                     return dto;
                 })
                 .sorted((a, b) -> b.getLastMessageAt().compareTo(a.getLastMessageAt()))
                 .toList();
 
         return ResponseEntity.ok(conversations);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // MARK ROOM AS READ
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @PutMapping("/api/chat/{roomId}/read")
+    @ResponseBody
+    @Transactional
+    public ResponseEntity<Void> markRoomAsRead(@PathVariable String roomId, Principal principal) {
+        messageRepository.markRoomMessagesAsRead(roomId, principal.getName());
+        return ResponseEntity.noContent().build();
     }
 }

@@ -14,6 +14,7 @@ export interface Conversation {
   otherProfilePictureUrl: string | null;
   lastMessage: string;
   lastMessageAt: string;
+  unreadCount: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -127,6 +128,11 @@ export class ChatService {
     return this.http.delete<void>(
       `${environment.apiUrl}/api/chat/rooms/${encodeURIComponent(roomId)}`
     );
+  }
+
+  /** Mark all messages in a room as read for the current user. */
+  markRoomAsRead(roomId: string): Observable<void> {
+    return this.http.put<void>(`${environment.apiUrl}/api/chat/${roomId}/read`, {});
   }
 
   disconnect(): void {

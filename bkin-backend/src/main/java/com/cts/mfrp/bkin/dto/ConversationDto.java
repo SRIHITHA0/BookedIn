@@ -7,6 +7,7 @@ public class ConversationDto {
     private String otherProfilePictureUrl;
     private String lastMessage;
     private String lastMessageAt;
+    private int unreadCount;
 
     public String getRoomId() { return roomId; }
     public void setRoomId(String roomId) { this.roomId = roomId; }
@@ -20,4 +21,6 @@ public class ConversationDto {
     public void setLastMessage(String lastMessage) { this.lastMessage = lastMessage; }
     public String getLastMessageAt() { return lastMessageAt; }
     public void setLastMessageAt(String lastMessageAt) { this.lastMessageAt = lastMessageAt; }
+    public int getUnreadCount() { return unreadCount; }
+    public void setUnreadCount(int unreadCount) { this.unreadCount = unreadCount; }
 }

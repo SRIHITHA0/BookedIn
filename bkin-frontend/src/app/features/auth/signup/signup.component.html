@@ -8,10 +8,11 @@
       <div class="absolute -bottom-16 -right-16 w-56 h-56 rounded-full bg-crimson/5  blur-2xl pointer-events-none"></div>
 
       <div class="relative z-10 text-center">
-        <div class="flex items-center justify-center gap-3 mb-4">
-          <img src="assets/bookedin_logo_transparent.png" alt="" class="h-10 w-auto" />
-          <span class="text-crimson text-4xl font-extrabold tracking-tight">BookedIn</span>
-        </div>
+        <!-- Large logo stacked above the title -->
+        <img src="assets/bookedin_logo_transparent.png" alt="BookedIn"
+             class="w-32 h-32 object-contain mx-auto mb-3" />
+        <span class="text-crimson text-4xl font-extrabold tracking-tight">BookedIn</span>
+        <div class="mt-1 mb-4"></div>
         <p class="text-gray-400 text-sm leading-relaxed mb-10 max-w-xs">
           Your literary universe awaits. Connect with readers who share your passion.
         </p>
@@ -49,15 +50,6 @@
           <input type="text" formControlName="displayName" placeholder="e.g. The Crimson Reader" class="bkin-input" />
           <span *ngIf="f['displayName'].invalid && f['displayName'].touched" class="bkin-error">
             Display name is required.
-          </span>
-        </div>
-
-        <!-- Username -->
-        <div>
-          <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Username</label>
-          <input type="text" formControlName="username" placeholder="@yourhandle" class="bkin-input" />
-          <span *ngIf="f['username'].invalid && f['username'].touched" class="bkin-error">
-            Username must be 3–50 characters.
           </span>
         </div>
 

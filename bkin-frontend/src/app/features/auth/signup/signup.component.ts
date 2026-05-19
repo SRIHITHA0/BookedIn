@@ -53,8 +53,7 @@ export class SignupComponent implements OnInit {
     private router: Router
   ) {
     this.signupForm = this.fb.group({
-      displayName:  ['', [Validators.required, Validators.maxLength(100)]],
-      username:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
+      displayName:  ['', [Validators.required, Validators.maxLength(50)]],
       email:        ['', [Validators.required, Validators.email]],
       password:     ['', [Validators.required, Validators.minLength(8)]],
       dateOfBirth:  ['', [Validators.required, noFutureDate]],

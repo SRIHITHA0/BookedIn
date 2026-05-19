@@ -14,12 +14,12 @@
 
       <form [formGroup]="loginForm" (ngSubmit)="onLogin()" class="space-y-5" novalidate>
 
-        <!-- Username -->
+        <!-- Display Name -->
         <div>
-          <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Username</label>
-          <input type="text" formControlName="username" placeholder="@yourhandle" class="bkin-input" />
+          <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Display Name</label>
+          <input type="text" formControlName="username" placeholder="Your display name" class="bkin-input" />
           <span *ngIf="f['username'].invalid && f['username'].touched" class="bkin-error">
-            Username is required.
+            Display name is required.
           </span>
         </div>
 

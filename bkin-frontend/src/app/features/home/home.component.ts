@@ -46,6 +46,10 @@ export class HomeComponent implements OnInit {
     return this.displayName ? this.displayName.charAt(0).toUpperCase() : '?';
   }
 
+  get totalUnreadMessages(): number {
+    return this.personalConversations.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+  }
+
   ngOnInit(): void {
     this.displayName = this.authService.getDisplayName();
     this.loadTrendingBooks();
@@ -55,6 +59,8 @@ export class HomeComponent implements OnInit {
     this.userService.getMyProfile().subscribe({
       next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
     });
+    // Load DM conversations on init so the unread badge is populated immediately
+    this.loadPersonalChats();
   }
 
   loadTrendingBooks(): void {

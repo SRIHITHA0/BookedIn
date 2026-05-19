@@ -96,6 +96,9 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       error: () => { this.isLoadingHistory = false; }
     });
 
+    // Mark this room's messages as read so the badge clears
+    this.chatService.markRoomAsRead(newRoomId).subscribe({ error: () => {} });
+
     // Subscribe to new messages
     this.msgSub = this.chatService.connect(this.roomId).subscribe(msg => {
       this.messages.push(msg);
