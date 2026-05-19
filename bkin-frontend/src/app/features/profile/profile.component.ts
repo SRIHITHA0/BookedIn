@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+
+function noFutureDate(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const entered = new Date(control.value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return entered > today ? { futureDate: true } : null;
+}
 import { RouterModule, Router } from '@angular/router';
 import { UserService, UserProfile, ShelfItem } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -58,7 +66,7 @@ export class ProfileComponent implements OnInit {
       displayName:       ['', [Validators.required, Validators.maxLength(100)]],
       bio:               [''],
       profilePictureUrl: [''],
-      dateOfBirth:       [''],
+      dateOfBirth:       ['', noFutureDate],
       gender:            [''],
       country:           ['']
     });

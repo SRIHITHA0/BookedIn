@@ -99,8 +99,11 @@
             <label class="block text-gray-400 text-[10px] uppercase tracking-widest mb-1.5">Date of Birth</label>
             <input type="date" formControlName="dateOfBirth" [max]="maxDob"
               class="bkin-input" />
-            <span *ngIf="f['dateOfBirth'].invalid && f['dateOfBirth'].touched" class="bkin-error">
+            <span *ngIf="f['dateOfBirth'].touched && f['dateOfBirth'].errors?.['required']" class="bkin-error">
               Date of birth is required.
+            </span>
+            <span *ngIf="f['dateOfBirth'].touched && f['dateOfBirth'].errors?.['futureDate']" class="bkin-error">
+              Date of birth cannot be a future date.
             </span>
           </div>
           <div>

@@ -1,6 +1,14 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
+
+function noFutureDate(control: AbstractControl): ValidationErrors | null {
+  if (!control.value) return null;
+  const entered = new Date(control.value);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return entered > today ? { futureDate: true } : null;
+}
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -49,7 +57,7 @@ export class SignupComponent implements OnInit {
       username:     ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]],
       email:        ['', [Validators.required, Validators.email]],
       password:     ['', [Validators.required, Validators.minLength(8)]],
-      dateOfBirth:  ['', Validators.required],
+      dateOfBirth:  ['', [Validators.required, noFutureDate]],
       gender:       ['', Validators.required],
       country:      ['', Validators.required]
     });
