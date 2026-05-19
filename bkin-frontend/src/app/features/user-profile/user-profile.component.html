@@ -50,7 +50,7 @@
           <p class="text-gray-500 text-xs mt-0.5">Member since {{ profile.createdAt | slice:0:10 }}</p>
           <p *ngIf="profile.bio" class="text-gray-400 text-sm mt-2 leading-relaxed">{{ profile.bio }}</p>
           <!-- Interests -->
-          <div *ngIf="profile.interests?.length > 0" class="flex flex-wrap gap-1.5 mt-3">
+          <div *ngIf="(profile.interests?.length ?? 0) > 0" class="flex flex-wrap gap-1.5 mt-3">
             <span *ngFor="let i of profile.interests" class="genre-tag genre-tag-active pointer-events-none text-[11px] px-2 py-0.5">
               {{ i }}
             </span>
