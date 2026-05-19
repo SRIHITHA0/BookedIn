@@ -124,6 +124,11 @@ export class BookDetailsComponent implements OnInit {
     this.router.navigate(['/chat', roomId]);
   }
 
+  goToUserProfile(username: string): void {
+    if (username === this.currentUsername) { this.router.navigate(['/profile']); return; }
+    this.router.navigate(['/users', username]);
+  }
+
   avatarLetter(name: string): string {
     return name ? name.charAt(0).toUpperCase() : '?';
   }

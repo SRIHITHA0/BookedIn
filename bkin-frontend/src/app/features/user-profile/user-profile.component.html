@@ -1,0 +1,182 @@
+<div class="min-h-screen bg-obsidian">
+
+  <!-- Navbar -->
+  <nav class="sticky top-0 z-50 bg-surface-100/80 backdrop-blur-md border-b border-surface-300 px-4 sm:px-6 py-3 sm:py-4">
+    <div class="max-w-2xl mx-auto flex items-center justify-between">
+      <button (click)="goBack()" class="text-gray-400 hover:text-crimson transition-colors flex items-center gap-2 text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+        </svg>
+        Back
+      </button>
+      <a routerLink="/home" class="flex items-center gap-2 hover:opacity-80 transition-opacity">
+        <img src="assets/bookedin_logo_transparent.png" alt="" class="h-7 sm:h-8 w-auto" />
+        <span class="text-crimson text-xl font-extrabold tracking-tight">BookedIn</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex justify-center items-center py-32">
+    <svg class="animate-spin h-8 w-8 text-crimson" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 12 0 12 4.418z"></path>
+    </svg>
+  </div>
+
+  <!-- Not found -->
+  <div *ngIf="!isLoading && notFound" class="text-center py-32 text-gray-500">
+    <p class="text-5xl mb-4">👤</p>
+    <p class="text-lg font-medium">User not found</p>
+  </div>
+
+  <!-- Profile content -->
+  <div *ngIf="!isLoading && profile" class="max-w-2xl mx-auto px-4 sm:px-6 py-6">
+
+    <!-- Profile Card -->
+    <div class="bg-surface-100 border border-surface-300 rounded-2xl p-6 mb-6">
+      <div class="flex items-start gap-4">
+        <!-- Avatar -->
+        <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-crimson/20 border-2 border-crimson/40
+                    flex items-center justify-center text-crimson text-2xl font-bold flex-shrink-0 overflow-hidden">
+          <img *ngIf="profile.profilePictureUrl" [src]="profile.profilePictureUrl"
+            class="w-full h-full object-cover"
+            onerror="this.style.display='none'" />
+          <span *ngIf="!profile.profilePictureUrl">{{ avatarLetter(profile.displayName) }}</span>
+        </div>
+        <!-- Info -->
+        <div class="flex-1 min-w-0">
+          <h1 class="text-white text-xl font-bold">{{ profile.displayName }}</h1>
+          <p class="text-gray-500 text-xs mt-0.5">Member since {{ profile.createdAt | slice:0:10 }}</p>
+          <p *ngIf="profile.bio" class="text-gray-400 text-sm mt-2 leading-relaxed">{{ profile.bio }}</p>
+          <!-- Interests -->
+          <div *ngIf="profile.interests?.length > 0" class="flex flex-wrap gap-1.5 mt-3">
+            <span *ngFor="let i of profile.interests" class="genre-tag genre-tag-active pointer-events-none text-[11px] px-2 py-0.5">
+              {{ i }}
+            </span>
+          </div>
+        </div>
+      </div>
+      <!-- Let's Connect button -->
+      <button (click)="connectWithUser()"
+        class="mt-5 w-full flex items-center justify-center gap-2 bg-crimson hover:bg-crimson-hover
+               text-white text-sm font-semibold rounded-xl py-3 transition-all shadow-crimson">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+        </svg>
+        Let's Connect
+      </button>
+    </div>
+
+    <!-- Posts -->
+    <h2 class="text-white text-base font-semibold mb-4 flex items-center gap-2">
+      <span class="w-1 h-5 bg-crimson rounded-full inline-block"></span>
+      Posts
+      <span class="text-gray-600 text-sm font-normal">({{ posts.length }})</span>
+    </h2>
+
+    <p *ngIf="posts.length === 0" class="text-gray-600 text-sm text-center py-10 border border-surface-300 border-dashed rounded-xl">
+      No posts yet.
+    </p>
+
+    <!-- Post feed -->
+    <div class="space-y-4">
+      <div *ngFor="let post of posts" class="bg-surface-100 border border-surface-300 rounded-2xl overflow-hidden">
+
+        <!-- Post header -->
+        <div class="flex items-center gap-3 p-4 pb-3">
+          <button (click)="goToUserProfile(post.authorUsername)"
+            class="w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
+                   text-crimson text-sm font-bold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity">
+            <img *ngIf="post.authorProfilePicUrl" [src]="post.authorProfilePicUrl"
+              class="w-full h-full object-cover" onerror="this.style.display='none'" />
+            <span *ngIf="!post.authorProfilePicUrl">{{ avatarLetter(post.authorDisplayName) }}</span>
+          </button>
+          <div class="flex-1 min-w-0">
+            <button (click)="goToUserProfile(post.authorUsername)"
+              class="text-white text-sm font-semibold hover:text-crimson transition-colors block truncate text-left">
+              {{ post.authorDisplayName }}
+            </button>
+            <p class="text-gray-500 text-xs">
+              {{ timeAgo(post.createdAt) }}
+              <span *ngIf="post.isEdited" class="ml-1 text-gray-600">(edited)</span>
+            </p>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="px-4 pb-3">
+          <p class="text-white text-sm leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
+        </div>
+        <!-- Image -->
+        <img *ngIf="post.imageUrl" [src]="post.imageUrl" class="w-full max-h-80 object-cover"
+          onerror="this.style.display='none'" />
+
+        <!-- Actions -->
+        <div class="flex items-center gap-4 px-4 py-3 border-t border-surface-300">
+          <button (click)="toggleLike(post)"
+            class="flex items-center gap-1.5 text-sm transition-colors"
+            [ngClass]="post.likedByMe ? 'text-crimson' : 'text-gray-500 hover:text-crimson'">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+              [attr.fill]="post.likedByMe ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+            <span>{{ post.likeCount }}</span>
+          </button>
+          <button (click)="toggleComments(post)"
+            class="flex items-center gap-1.5 text-sm text-gray-500 hover:text-crimson transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+            <span>{{ post.commentCount }}</span>
+          </button>
+        </div>
+
+        <!-- Comments section -->
+        <div *ngIf="post.showComments" class="border-t border-surface-300 px-4 py-3 space-y-3">
+          <div *ngFor="let c of post.comments" class="flex gap-2.5">
+            <button (click)="goToUserProfile(c.authorUsername)"
+              class="w-7 h-7 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
+                     text-crimson text-xs font-bold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity">
+              <img *ngIf="c.authorProfilePicUrl" [src]="c.authorProfilePicUrl"
+                class="w-full h-full object-cover" onerror="this.style.display='none'" />
+              <span *ngIf="!c.authorProfilePicUrl">{{ avatarLetter(c.authorDisplayName) }}</span>
+            </button>
+            <div class="flex-1 min-w-0 bg-surface-200 rounded-xl px-3 py-2">
+              <div class="flex items-center justify-between gap-2">
+                <button (click)="goToUserProfile(c.authorUsername)"
+                  class="text-white text-xs font-semibold hover:text-crimson transition-colors">
+                  {{ c.authorDisplayName }}
+                </button>
+                <div class="flex items-center gap-1.5">
+                  <span class="text-gray-600 text-[10px]">{{ timeAgo(c.createdAt) }}</span>
+                  <button *ngIf="c.authorUsername === currentUsername" (click)="deleteComment(post, c)"
+                    class="text-gray-600 hover:text-red-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">{{ c.content }}</p>
+            </div>
+          </div>
+          <!-- Add comment -->
+          <div class="flex gap-2">
+            <input [(ngModel)]="post.newCommentText" (keyup.enter)="submitComment(post)"
+              placeholder="Write a comment..." [disabled]="post.isSubmittingComment"
+              class="flex-1 bg-surface-200 border border-surface-300 text-white text-xs placeholder-gray-600
+                     rounded-full px-3 py-2 focus:outline-none focus:border-crimson transition-all" />
+            <button (click)="submitComment(post)" [disabled]="!post.newCommentText?.trim() || post.isSubmittingComment"
+              class="bg-crimson hover:bg-crimson-hover disabled:opacity-40 text-white rounded-full px-3 py-1.5 text-xs font-medium transition-all">
+              Post
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

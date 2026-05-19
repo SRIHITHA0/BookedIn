@@ -51,5 +51,10 @@ export const routes: Routes = [
     canActivate: [authGuard],
     loadComponent: () => import('./features/shelf/shelf.component').then(m => m.ShelfComponent)
   },
+  {
+    path: 'users/:username',
+    canActivate: [authGuard],
+    loadComponent: () => import('./features/user-profile/user-profile.component').then(m => m.UserProfileComponent)
+  },
   { path: '**', redirectTo: 'home' }
 ];

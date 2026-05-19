@@ -11,7 +11,7 @@
           <span class="text-crimson text-lg sm:text-xl font-extrabold tracking-tight hidden sm:inline">BookedIn</span>
         </a>
 
-        <!-- Search bar (flex-1) -->
+        <!-- Search bar -->
         <div class="flex-1 relative min-w-0">
           <input type="text" [(ngModel)]="searchQuery"
             (keyup.enter)="onSearch()"
@@ -36,15 +36,20 @@
         <!-- Right actions -->
         <div class="flex items-center gap-1 sm:gap-2 flex-shrink-0">
 
-          <!-- Chat -->
-          <button (click)="openChat()"
-            class="hidden sm:flex text-gray-400 hover:text-white text-sm transition-colors items-center gap-2
+          <!-- Chat button with unread badge -->
+          <button (click)="goToChat()"
+            class="relative hidden sm:flex text-gray-400 hover:text-white text-sm transition-colors items-center gap-2
                    border border-surface-300 hover:border-crimson/50 rounded-lg px-3.5 py-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                 d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
             </svg>
             <span class="hidden lg:inline">Chat</span>
+            <span *ngIf="totalUnreadMessages > 0"
+              class="absolute -top-1.5 -right-1.5 bg-crimson text-white text-[9px] font-bold
+                     rounded-full min-w-[16px] h-4 flex items-center justify-center px-1 leading-none">
+              {{ totalUnreadMessages > 99 ? '99+' : totalUnreadMessages }}
+            </span>
           </button>
 
           <!-- My Shelf -->
@@ -72,72 +77,92 @@
     </div>
   </nav>
 
-  <!-- ═══════════ CHAT SELECTOR MODAL ═══════════ -->
-  <div *ngIf="showChatSelector"
-    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/60 backdrop-blur-sm"
-    (click)="closeChatSelector()">
-    <div class="bg-surface-100 border border-surface-300 rounded-t-2xl sm:rounded-2xl p-5 w-full sm:w-80
-                shadow-crimson max-h-[80vh] flex flex-col"
-      (click)="$event.stopPropagation()">
-      <h3 class="text-white font-semibold mb-4">Chat</h3>
-
-      <div class="flex bg-surface-200 rounded-xl p-1 mb-4 gap-1">
-        <button (click)="chatSection = 'group'"
-          [ngClass]="chatSection === 'group' ? 'bg-crimson text-white' : 'text-gray-400 hover:text-white'"
-          class="flex-1 text-xs font-semibold py-2 rounded-lg transition-all">
-          Group Chats
-        </button>
-        <button (click)="chatSection = 'personal'"
-          [ngClass]="chatSection === 'personal' ? 'bg-crimson text-white' : 'text-gray-400 hover:text-white'"
-          class="flex-1 text-xs font-semibold py-2 rounded-lg transition-all">
-          Personal
-        </button>
-      </div>
-
-      <div class="overflow-y-auto flex-1">
-        <div *ngIf="chatSection === 'group'" class="space-y-2">
-          <button *ngFor="let room of chatRooms" (click)="goToChat(room)"
-            class="w-full text-left px-4 py-3 rounded-xl bg-surface-200 border border-surface-300
-                   hover:border-crimson/50 hover:bg-surface-300 text-white text-sm transition-all flex items-center gap-3">
-            <span class="capitalize">{{ room }}</span>
-          </button>
-        </div>
-
-        <div *ngIf="chatSection === 'personal'">
-          <p *ngIf="personalConversations.length === 0"
-            class="text-gray-500 text-sm text-center py-6 leading-relaxed">
-            No private conversations yet.<br/>
-            <span class="text-gray-600 text-xs">Use "Let's Connect" on book reviews to start a DM.</span>
-          </p>
-          <div *ngIf="personalConversations.length > 0" class="space-y-2">
-            <button *ngFor="let conv of personalConversations" (click)="goToChat(conv.roomId)"
-              class="w-full text-left px-3 py-2.5 rounded-xl bg-surface-200 border border-surface-300
-                     hover:border-crimson/50 hover:bg-surface-300 transition-all flex items-center gap-3">
-              <div class="w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40
-                          flex items-center justify-center text-crimson text-sm font-bold flex-shrink-0">
-                {{ avatarLetter(conv.otherDisplayName) }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-white text-sm font-medium truncate">{{ conv.otherDisplayName }}</p>
-                <p class="text-gray-500 text-xs truncate">{{ conv.lastMessage || 'Start a conversation' }}</p>
-              </div>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <button (click)="closeChatSelector()"
-        class="mt-4 w-full text-gray-500 hover:text-white text-sm transition-colors py-2 flex-shrink-0">
-        Cancel
-      </button>
-    </div>
-  </div>
-
   <!-- ═══════════ MAIN CONTENT ═══════════ -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 py-5 sm:py-8">
 
-    <!-- Genre Filter Bar -->
-    <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-6 scrollbar-none">
+    <!-- ── Continue Reading ── -->
+    <ng-container *ngIf="continueReading.length > 0">
+      <h2 class="text-white text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
+        <span class="w-1 h-5 bg-crimson rounded-full inline-block"></span>
+        Continue Reading
+      </h2>
+      <div class="flex gap-3 overflow-x-auto pb-3 mb-6 scrollbar-none">
+        <div *ngFor="let item of continueReading" (click)="goToBook(item.book.id)"
+          class="flex-shrink-0 w-28 sm:w-32 bkin-card cursor-pointer group">
+          <div class="relative aspect-[2/3] bg-surface-200 overflow-hidden">
+            <img [src]="item.book.coverImageUrl" [alt]="item.book.title"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onerror="this.onerror=null;this.src='https://placehold.co/150x225/E2EAFF/2B6EE8?text=BookedIn'" />
+            <!-- Reading progress bar placeholder -->
+            <div class="absolute bottom-0 left-0 right-0 h-1 bg-surface-300">
+              <div class="h-full bg-crimson rounded-full" style="width: 40%"></div>
+            </div>
+          </div>
+          <div class="p-2">
+            <h3 class="text-white text-[11px] font-semibold line-clamp-2 leading-tight mb-0.5">{{ item.book.title }}</h3>
+            <p class="text-gray-500 text-[10px] line-clamp-1">{{ item.book.author }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── For You ── -->
+    <ng-container *ngIf="forYouBooks.length > 0">
+      <h2 class="text-white text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
+        <span class="w-1 h-5 bg-crimson rounded-full inline-block"></span>
+        For You
+      </h2>
+      <div class="flex gap-3 overflow-x-auto pb-3 mb-6 scrollbar-none">
+        <div *ngFor="let book of forYouBooks" (click)="goToBook(book.id)"
+          class="flex-shrink-0 w-28 sm:w-32 bkin-card cursor-pointer group">
+          <div class="relative aspect-[2/3] bg-surface-200 overflow-hidden">
+            <img [src]="book.coverImageUrl" [alt]="book.title"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onerror="this.onerror=null;this.src='https://placehold.co/150x225/E2EAFF/2B6EE8?text=BookedIn'" />
+            <div class="absolute top-1.5 right-1.5">
+              <span class="bg-obsidian/80 text-crimson text-[9px] font-bold px-1.5 py-0.5 rounded">
+                {{ book.genre?.name ?? '' }}
+              </span>
+            </div>
+          </div>
+          <div class="p-2">
+            <h3 class="text-white text-[11px] font-semibold line-clamp-2 leading-tight mb-0.5">{{ book.title }}</h3>
+            <p class="text-gray-500 text-[10px] line-clamp-1">{{ book.author }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── Trending Now ── -->
+    <ng-container *ngIf="trendingBooks.length > 0">
+      <h2 class="text-white text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
+        <span class="w-1 h-5 bg-crimson rounded-full inline-block"></span>
+        Trending Now
+        <span class="text-xs text-gray-600 font-normal">🔥</span>
+      </h2>
+      <div class="flex gap-3 overflow-x-auto pb-3 mb-6 scrollbar-none">
+        <div *ngFor="let book of trendingBooks; let i = index" (click)="goToBook(book.id)"
+          class="flex-shrink-0 w-28 sm:w-32 bkin-card cursor-pointer group">
+          <div class="relative aspect-[2/3] bg-surface-200 overflow-hidden">
+            <img [src]="book.coverImageUrl" [alt]="book.title"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              onerror="this.onerror=null;this.src='https://placehold.co/150x225/E2EAFF/2B6EE8?text=BookedIn'" />
+            <div class="absolute top-1.5 left-1.5">
+              <span class="bg-crimson text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
+                #{{ i + 1 }}
+              </span>
+            </div>
+          </div>
+          <div class="p-2">
+            <h3 class="text-white text-[11px] font-semibold line-clamp-2 leading-tight mb-0.5">{{ book.title }}</h3>
+            <p class="text-gray-500 text-[10px] line-clamp-1">{{ book.author }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <!-- ── Genre Filter Bar ── -->
+    <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-5 scrollbar-none">
       <button (click)="filterByGenre('all')"
         [ngClass]="selectedGenreFilter === 'all' ? 'genre-tag genre-tag-active' : 'genre-tag genre-tag-inactive'">
         All

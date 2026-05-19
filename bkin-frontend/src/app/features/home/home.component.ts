@@ -1,12 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
-import { BookService, ShelfBook, CommunityReview } from '../../core/services/book.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { ChatService, Conversation } from '../../core/services/chat.service';
-import { Book } from '../../models/book.model';
+import { PostService } from '../../core/services/post.service';
+import { Post, BkinComment } from '../../models/post.model';
 
 @Component({
   selector: 'app-home',
@@ -16,26 +16,43 @@ import { Book } from '../../models/book.model';
 })
 export class HomeComponent implements OnInit {
 
-  trendingBooks:         Book[]           = [];
-  forYouBooks:           Book[]           = [];
-  currentlyReadingBooks: ShelfBook[]      = [];
-  communityReviews:      CommunityReview[] = [];
-  searchResults:         Book[]           = [];
-  searchQuery           = '';
-  isSearchActive        = false;
-  isSearchLoading       = false;
-  displayName           = '';
-  myProfilePicUrl       = '';
-  showMobileSearch      = false;
-  showMobileMenu        = false;
+  // ── User state ─────────────────────────────────────────────────────────
+  displayName        = '';
+  currentUsername    = '';
+  myProfilePicUrl    = '';
+  showMobileMenu     = false;
+
+  // ── Unread badge ───────────────────────────────────────────────────────
   personalConversations: Conversation[] = [];
   groupRoomUnreadCounts: { [room: string]: number } = {};
 
+  // ── Posts feed ─────────────────────────────────────────────────────────
+  posts: Post[] = [];
+  isLoadingPosts = false;
+
+  // ── Create / Edit post modal ───────────────────────────────────────────
+  showCreateModal  = false;
+  newPostContent   = '';
+  newPostImageUrl  = '';
+  newPostImageData = '';   // base64 data URI from file upload
+  showEmojiPicker  = false;
+  showImageInput   = false;
+  imageInputMode: 'url' | 'upload' = 'url';
+  isCreatingPost   = false;
+
+  @ViewChild('postTextarea') postTextarea!: ElementRef<HTMLTextAreaElement>;
+
+  readonly emojis = [
+    '😀','😂','😍','🥰','😎','🤔','😢','😡','🤩','🥳',
+    '👍','👎','❤️','🔥','✨','🎉','📚','📖','✍️','💡',
+    '🌟','💯','🙌','👏','🤝','😊','💬','📝','🎭','🫂'
+  ];
+
   constructor(
-    private bookService: BookService,
     private authService: AuthService,
     private userService: UserService,
     private chatService: ChatService,
+    private postService: PostService,
     private router: Router
   ) {}
 
@@ -50,72 +67,157 @@ export class HomeComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.displayName = this.authService.getDisplayName();
-    this.loadTrendingBooks();
-    this.loadForYouBooks();
-    this.loadCurrentlyReading();
-    this.loadCommunityReviews();
+    this.displayName     = this.authService.getDisplayName();
+    this.currentUsername = this.authService.getUsername();
     this.userService.getMyProfile().subscribe({
       next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
     });
-    // Load DM + group unread counts so the badge is populated immediately
+    this.loadFeed();
     this.loadPersonalChats();
     this.loadGroupUnreadCounts();
   }
 
-  loadTrendingBooks(): void {
-    this.bookService.getTrendingBooks().subscribe({
-      next: (books) => this.trendingBooks = books
+  // ── Feed ───────────────────────────────────────────────────────────────
+
+  loadFeed(): void {
+    this.isLoadingPosts = true;
+    this.postService.getFeed().subscribe({
+      next: (posts) => { this.posts = posts; this.isLoadingPosts = false; },
+      error: () => { this.isLoadingPosts = false; }
     });
   }
 
-  loadForYouBooks(): void {
-    this.bookService.getForYouBooks().subscribe({
-      next: (books) => this.forYouBooks = books,
-      error: () => this.forYouBooks = []
+  // ── Create post ────────────────────────────────────────────────────────
+
+  openCreateModal(): void {
+    this.showCreateModal  = true;
+    this.newPostContent   = '';
+    this.newPostImageUrl  = '';
+    this.newPostImageData = '';
+    this.showEmojiPicker  = false;
+    this.showImageInput   = false;
+    this.imageInputMode   = 'url';
+  }
+
+  closeCreateModal(): void { this.showCreateModal = false; }
+
+  insertEmoji(emoji: string): void {
+    this.newPostContent += emoji;
+    this.showEmojiPicker = false;
+  }
+
+  onImageFile(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file  = input.files?.[0];
+    if (!file) return;
+    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2 MB'); return; }
+    const reader = new FileReader();
+    reader.onload = () => { this.newPostImageData = reader.result as string; };
+    reader.readAsDataURL(file);
+  }
+
+  get resolvedNewPostImage(): string {
+    return this.imageInputMode === 'upload' ? this.newPostImageData : this.newPostImageUrl;
+  }
+
+  submitPost(): void {
+    if (!this.newPostContent.trim() || this.isCreatingPost) return;
+    this.isCreatingPost = true;
+    const imageUrl = this.resolvedNewPostImage || undefined;
+    this.postService.createPost(this.newPostContent.trim(), imageUrl).subscribe({
+      next: (post) => {
+        this.posts = [post, ...this.posts];
+        this.isCreatingPost   = false;
+        this.showCreateModal  = false;
+      },
+      error: () => { this.isCreatingPost = false; }
     });
   }
 
-  loadCurrentlyReading(): void {
-    this.bookService.getMyShelf().subscribe({
-      next: (items) => this.currentlyReadingBooks = items.filter(i => i.status === 'READING').slice(0, 3),
-      error: () => {}
+  // ── Edit post ──────────────────────────────────────────────────────────
+
+  startEdit(post: Post): void {
+    post.isEditing   = true;
+    post.editContent = post.content;
+    post.editImageUrl = post.imageUrl ?? '';
+  }
+
+  cancelEdit(post: Post): void { post.isEditing = false; }
+
+  saveEdit(post: Post): void {
+    const content = (post.editContent ?? '').trim();
+    if (!content) return;
+    this.postService.editPost(post.id, content, post.editImageUrl || null).subscribe({
+      next: (updated) => {
+        const idx = this.posts.findIndex(p => p.id === post.id);
+        if (idx !== -1) {
+          this.posts[idx] = { ...updated, isEditing: false, showComments: post.showComments };
+        }
+      }
     });
   }
 
-  loadCommunityReviews(): void {
-    this.bookService.getRecentCommunityReviews().subscribe({
-      next: (reviews) => this.communityReviews = reviews,
-      error: () => {}
+  // ── Delete post ────────────────────────────────────────────────────────
+
+  deletePost(post: Post): void {
+    if (!confirm('Delete this post?')) return;
+    this.postService.deletePost(post.id).subscribe({
+      next: () => { this.posts = this.posts.filter(p => p.id !== post.id); }
     });
   }
 
-  onSearch(): void {
-    const q = this.searchQuery.trim();
-    if (!q) return;
-    this.showMobileSearch = false;
-    this.isSearchActive = true;
-    this.isSearchLoading = true;
-    this.searchResults = [];
-    this.bookService.searchBooks(q).subscribe({
-      next: (books) => { this.searchResults = books; this.isSearchLoading = false; },
-      error: () => { this.searchResults = []; this.isSearchLoading = false; }
+  // ── Like ───────────────────────────────────────────────────────────────
+
+  toggleLike(post: Post): void {
+    this.postService.toggleLike(post.id).subscribe({
+      next: (res) => { post.likedByMe = res.liked; post.likeCount = res.likeCount; }
     });
   }
 
-  clearSearch(): void {
-    this.searchQuery = '';
-    this.searchResults = [];
-    this.isSearchActive = false;
-    this.isSearchLoading = false;
+  // ── Comments ───────────────────────────────────────────────────────────
+
+  toggleComments(post: Post): void {
+    post.showComments = !post.showComments;
+    if (post.showComments && post.newCommentText === undefined) post.newCommentText = '';
   }
 
-  goToBook(id: number): void { this.router.navigate(['/books', id]); }
+  submitComment(post: Post): void {
+    const text = (post.newCommentText ?? '').trim();
+    if (!text || post.isSubmittingComment) return;
+    post.isSubmittingComment = true;
+    this.postService.addComment(post.id, text).subscribe({
+      next: (comment) => {
+        post.comments = [...post.comments, comment];
+        post.commentCount++;
+        post.newCommentText = '';
+        post.isSubmittingComment = false;
+      },
+      error: () => { post.isSubmittingComment = false; }
+    });
+  }
+
+  deleteComment(post: Post, comment: BkinComment): void {
+    this.postService.deleteComment(post.id, comment.id).subscribe({
+      next: () => {
+        post.comments = post.comments.filter(c => c.id !== comment.id);
+        post.commentCount--;
+      }
+    });
+  }
+
+  // ── Navigation ─────────────────────────────────────────────────────────
+
+  goToUserProfile(username: string): void {
+    if (username === this.currentUsername) { this.router.navigate(['/profile']); return; }
+    this.router.navigate(['/users', username]);
+  }
 
   goToChat(): void {
     this.showMobileMenu = false;
     this.router.navigate(['/chat', 'general']);
   }
+
+  // ── Unread badge helpers ───────────────────────────────────────────────
 
   loadPersonalChats(): void {
     this.chatService.getPersonalConversations().subscribe({
@@ -131,12 +233,18 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  avatarLetter(name: string): string {
-    return name ? name.charAt(0).toUpperCase() : '?';
+  // ── Helpers ────────────────────────────────────────────────────────────
+
+  avatarLetter(name: string): string { return name ? name.charAt(0).toUpperCase() : '?'; }
+
+  timeAgo(dateStr: string): string {
+    const sec = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (sec < 60) return 'just now';
+    const m = Math.floor(sec / 60); if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);   if (h < 24)  return `${h}h ago`;
+    const d = Math.floor(h / 24);   if (d < 7)   return `${d}d ago`;
+    return new Date(dateStr).toLocaleDateString();
   }
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+  logout(): void { this.authService.logout(); this.router.navigate(['/login']); }
 }

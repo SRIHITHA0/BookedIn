@@ -264,6 +264,153 @@
       </form>
     </div>
 
+    <!-- ── My Posts Section ── -->
+    <div *ngIf="!isEditing" class="mt-2">
+      <h2 class="text-white text-base font-semibold mb-4 flex items-center gap-2">
+        <span class="w-1 h-5 bg-crimson rounded-full inline-block"></span>
+        My Posts
+        <span class="text-gray-600 text-sm font-normal">({{ myPosts.length }})</span>
+      </h2>
+
+      <p *ngIf="myPosts.length === 0"
+        class="text-gray-600 text-sm text-center py-10 border border-surface-300 border-dashed rounded-xl mb-6">
+        You haven't posted anything yet.
+        <a routerLink="/home" class="block mt-1 text-crimson hover:underline text-xs">Go to Home to create a post</a>
+      </p>
+
+      <div class="space-y-4 mb-6">
+        <div *ngFor="let post of myPosts" class="bg-surface-200 border border-surface-300 rounded-2xl overflow-hidden">
+
+          <!-- Post header -->
+          <div class="flex items-start gap-3 p-4 pb-3">
+            <div class="w-9 h-9 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
+                        text-crimson text-sm font-bold flex-shrink-0 overflow-hidden">
+              <img *ngIf="profile?.profilePictureUrl" [src]="profile!.profilePictureUrl"
+                class="w-full h-full object-cover" onerror="this.style.display='none'" />
+              <span *ngIf="!profile?.profilePictureUrl">{{ avatarLetter }}</span>
+            </div>
+            <div class="flex-1 min-w-0">
+              <p class="text-white text-sm font-semibold">{{ profile?.displayName }}</p>
+              <p class="text-gray-500 text-xs mt-0.5">
+                {{ timeAgo(post.createdAt) }}
+                <span *ngIf="post.isEdited" class="ml-1 text-gray-600">&bull; edited</span>
+              </p>
+            </div>
+            <!-- Edit / Delete -->
+            <div *ngIf="!post.isEditing" class="flex items-center gap-1 flex-shrink-0">
+              <button (click)="startEditPost(post)"
+                class="p-1.5 text-gray-500 hover:text-blue-400 hover:bg-surface-100 rounded-lg transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5M18.586 2.586a2 2 0 112.828 2.828L12 14.828l-4 1 1-4 9.414-9.414z"/>
+                </svg>
+              </button>
+              <button (click)="deletePost(post)"
+                class="p-1.5 text-gray-500 hover:text-red-400 hover:bg-surface-100 rounded-lg transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Inline edit form -->
+          <div *ngIf="post.isEditing" class="px-4 pb-4">
+            <textarea [(ngModel)]="post.editContent" rows="3"
+              class="w-full bg-surface-100 border border-surface-300 focus:border-crimson text-white text-sm
+                     placeholder-gray-600 rounded-xl px-4 py-3 resize-none focus:outline-none transition-all">
+            </textarea>
+            <div class="flex gap-2 mt-2 justify-end">
+              <button (click)="cancelEditPost(post)"
+                class="px-3 py-1.5 text-gray-400 hover:text-white border border-surface-300 rounded-lg text-xs transition-all">
+                Cancel
+              </button>
+              <button (click)="saveEditPost(post)"
+                class="px-3 py-1.5 bg-crimson hover:bg-crimson-hover text-white rounded-lg text-xs font-medium transition-all">
+                Save
+              </button>
+            </div>
+          </div>
+
+          <!-- View mode -->
+          <ng-container *ngIf="!post.isEditing">
+            <div class="px-4 pb-3">
+              <p class="text-white text-sm leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
+            </div>
+            <img *ngIf="post.imageUrl" [src]="post.imageUrl"
+              class="w-full max-h-72 object-cover" onerror="this.style.display='none'" />
+          </ng-container>
+
+          <!-- Action bar -->
+          <div class="flex items-center gap-4 px-4 py-3 border-t border-surface-300">
+            <button (click)="toggleLike(post)"
+              class="flex items-center gap-1.5 text-sm transition-colors"
+              [ngClass]="post.likedByMe ? 'text-crimson' : 'text-gray-500 hover:text-crimson'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                [attr.fill]="post.likedByMe ? 'currentColor' : 'none'" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+              <span>{{ post.likeCount }}</span>
+            </button>
+            <button (click)="toggleComments(post)"
+              class="flex items-center gap-1.5 text-sm transition-colors"
+              [ngClass]="post.showComments ? 'text-crimson' : 'text-gray-500 hover:text-crimson'">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+              </svg>
+              <span>{{ post.commentCount }}</span>
+            </button>
+          </div>
+
+          <!-- Comments -->
+          <div *ngIf="post.showComments" class="border-t border-surface-300 px-4 py-3 space-y-3">
+            <div *ngFor="let c of post.comments" class="flex gap-2.5">
+              <button (click)="goToUserProfile(c.authorUsername)"
+                class="w-7 h-7 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
+                       text-crimson text-xs font-bold flex-shrink-0 overflow-hidden hover:opacity-80 transition-opacity">
+                <img *ngIf="c.authorProfilePicUrl" [src]="c.authorProfilePicUrl"
+                  class="w-full h-full object-cover" onerror="this.style.display='none'" />
+                <span *ngIf="!c.authorProfilePicUrl">{{ postAvatarLetter(c.authorDisplayName) }}</span>
+              </button>
+              <div class="flex-1 min-w-0 bg-surface-100 rounded-xl px-3 py-2">
+                <div class="flex items-center justify-between gap-2">
+                  <button (click)="goToUserProfile(c.authorUsername)"
+                    class="text-white text-xs font-semibold hover:text-crimson transition-colors">
+                    {{ c.authorDisplayName }}
+                  </button>
+                  <div class="flex items-center gap-1.5">
+                    <span class="text-gray-600 text-[10px]">{{ timeAgo(c.createdAt) }}</span>
+                    <button (click)="deleteComment(post, c)"
+                      class="text-gray-600 hover:text-red-400 transition-colors">
+                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+                <p class="text-gray-400 text-xs mt-0.5 leading-relaxed">{{ c.content }}</p>
+              </div>
+            </div>
+            <div class="flex gap-2">
+              <input [(ngModel)]="post.newCommentText" (keyup.enter)="submitComment(post)"
+                placeholder="Write a comment..." [disabled]="post.isSubmittingComment"
+                class="flex-1 bg-surface-100 border border-surface-300 text-white text-xs placeholder-gray-600
+                       rounded-full px-3 py-2 focus:outline-none focus:border-crimson transition-all" />
+              <button (click)="submitComment(post)"
+                [disabled]="!post.newCommentText?.trim() || post.isSubmittingComment"
+                class="bg-crimson hover:bg-crimson-hover disabled:opacity-40 text-white rounded-full px-3 py-1.5 text-xs font-medium transition-all">
+                Post
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
     <!-- Quick Links -->
     <div class="grid grid-cols-2 gap-3 sm:gap-4" *ngIf="!isEditing">
       <a routerLink="/shelf"

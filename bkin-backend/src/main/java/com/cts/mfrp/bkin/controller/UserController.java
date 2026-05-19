@@ -46,6 +46,16 @@ public class UserController {
         return ResponseEntity.ok(UserProfileDto.from(user));
     }
 
+    /** Look up a public profile by displayName (unique since the username-removal change). */
+    @GetMapping("/by-display/{displayName}")
+    @Transactional(readOnly = true)
+    public ResponseEntity<UserProfileDto> getProfileByDisplayName(
+            @PathVariable String displayName) {
+        return userRepository.findByDisplayName(displayName)
+            .map(u -> ResponseEntity.ok(UserProfileDto.from(u)))
+            .orElse(ResponseEntity.notFound().build());
+    }
+
     @GetMapping("/{username}/avatar")
     public ResponseEntity<byte[]> getAvatar(@PathVariable String username) {
         User user = userRepository.findByUsername(username).orElse(null);

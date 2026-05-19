@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule, DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 
 function noFutureDate(control: AbstractControl): ValidationErrors | null {
@@ -12,11 +13,13 @@ function noFutureDate(control: AbstractControl): ValidationErrors | null {
 import { RouterModule, Router } from '@angular/router';
 import { UserService, UserProfile, ShelfItem } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
+import { PostService } from '../../core/services/post.service';
+import { Post, BkinComment } from '../../models/post.model';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule, DatePipe],
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, RouterModule, DatePipe],
   templateUrl: './profile.component.html'
 })
 export class ProfileComponent implements OnInit {
@@ -28,6 +31,9 @@ export class ProfileComponent implements OnInit {
   isSaving       = false;
   saveSuccess    = false;
   errorMessage   = '';
+
+  // ── My Posts ──────────────────────────────────────────────────────────
+  myPosts: Post[] = [];
 
   booksRead        = 0;
   currentlyReading = 0;
@@ -59,6 +65,7 @@ export class ProfileComponent implements OnInit {
   constructor(
     private userService: UserService,
     private authService: AuthService,
+    private postService: PostService,
     private fb: FormBuilder,
     private router: Router
   ) {
@@ -88,6 +95,15 @@ export class ProfileComponent implements OnInit {
         this.currentlyReading = items.filter(i => i.status === 'READING').length;
         this.wantToRead       = items.filter(i => i.status === 'WANT_TO_READ').length;
       }
+    });
+    this.loadMyPosts();
+  }
+
+  loadMyPosts(): void {
+    const username = this.authService.getUsername();
+    this.postService.getUserPosts(username).subscribe({
+      next: (posts) => this.myPosts = posts,
+      error: () => {}
     });
   }
 
@@ -164,6 +180,83 @@ export class ProfileComponent implements OnInit {
       this.uploadingImage = false;
     };
     reader.readAsDataURL(file);
+  }
+
+  // ── Post actions ──────────────────────────────────────────────────────
+
+  startEditPost(post: Post): void {
+    post.isEditing   = true;
+    post.editContent = post.content;
+    post.editImageUrl = post.imageUrl ?? '';
+  }
+
+  cancelEditPost(post: Post): void { post.isEditing = false; }
+
+  saveEditPost(post: Post): void {
+    const content = (post.editContent ?? '').trim();
+    if (!content) return;
+    this.postService.editPost(post.id, content, post.editImageUrl || null).subscribe({
+      next: (updated) => {
+        const idx = this.myPosts.findIndex(p => p.id === post.id);
+        if (idx !== -1) this.myPosts[idx] = { ...updated, isEditing: false, showComments: post.showComments };
+      }
+    });
+  }
+
+  deletePost(post: Post): void {
+    if (!confirm('Delete this post?')) return;
+    this.postService.deletePost(post.id).subscribe({
+      next: () => { this.myPosts = this.myPosts.filter(p => p.id !== post.id); }
+    });
+  }
+
+  toggleLike(post: Post): void {
+    this.postService.toggleLike(post.id).subscribe({
+      next: (res) => { post.likedByMe = res.liked; post.likeCount = res.likeCount; }
+    });
+  }
+
+  toggleComments(post: Post): void {
+    post.showComments = !post.showComments;
+    if (post.showComments && post.newCommentText === undefined) post.newCommentText = '';
+  }
+
+  submitComment(post: Post): void {
+    const text = (post.newCommentText ?? '').trim();
+    if (!text || post.isSubmittingComment) return;
+    post.isSubmittingComment = true;
+    this.postService.addComment(post.id, text).subscribe({
+      next: (comment) => {
+        post.comments = [...post.comments, comment];
+        post.commentCount++;
+        post.newCommentText = '';
+        post.isSubmittingComment = false;
+      },
+      error: () => { post.isSubmittingComment = false; }
+    });
+  }
+
+  deleteComment(post: Post, comment: BkinComment): void {
+    this.postService.deleteComment(post.id, comment.id).subscribe({
+      next: () => { post.comments = post.comments.filter(c => c.id !== comment.id); post.commentCount--; }
+    });
+  }
+
+  goToUserProfile(username: string): void {
+    const me = this.authService.getUsername();
+    if (username === me) return;
+    this.router.navigate(['/users', username]);
+  }
+
+  postAvatarLetter(name: string): string { return name ? name.charAt(0).toUpperCase() : '?'; }
+
+  timeAgo(dateStr: string): string {
+    const sec = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
+    if (sec < 60) return 'just now';
+    const m = Math.floor(sec / 60); if (m < 60) return `${m}m ago`;
+    const h = Math.floor(m / 60);   if (h < 24)  return `${h}h ago`;
+    const d = Math.floor(h / 24);   if (d < 7)   return `${d}d ago`;
+    return new Date(dateStr).toLocaleDateString();
   }
 
   signOut(): void {

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
-import { BookService } from '../../core/services/book.service';
+import { BookService, ShelfBook } from '../../core/services/book.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { ChatService, Conversation } from '../../core/services/chat.service';
@@ -16,19 +16,27 @@ import { Book, Genre } from '../../models/book.model';
 })
 export class LibraryComponent implements OnInit {
 
-  books:               Book[]  = [];
-  genres:              Genre[] = [];
-  searchQuery          = '';
-  selectedGenreFilter  = 'all';
-  isLoading            = false;
-  booksError           = false;
-  displayName          = '';
-  myProfilePicUrl      = '';
-  showChatSelector     = false;
-  chatSection          = 'group';
-  personalConversations: Conversation[] = [];
+  // ── All books / search ──────────────────────────────────────────────────
+  books:              Book[]  = [];
+  genres:             Genre[] = [];
+  searchQuery         = '';
+  selectedGenreFilter = 'all';
+  isLoading           = false;
+  booksError          = false;
 
-  readonly chatRooms = ['general', 'fiction', 'mystery', 'sci-fi', 'fantasy', 'thriller'];
+  // ── Discovery sections ──────────────────────────────────────────────────
+  continueReading:    ShelfBook[] = [];
+  forYouBooks:        Book[]      = [];
+  trendingBooks:      Book[]      = [];
+  isLoadingDiscovery  = false;
+
+  // ── User state ──────────────────────────────────────────────────────────
+  displayName     = '';
+  myProfilePicUrl = '';
+
+  // ── Unread badge ────────────────────────────────────────────────────────
+  personalConversations: Conversation[] = [];
+  groupRoomUnreadCounts: { [room: string]: number } = {};
 
   constructor(
     private bookService: BookService,
@@ -43,12 +51,21 @@ export class LibraryComponent implements OnInit {
     return this.displayName ? this.displayName.charAt(0).toUpperCase() : '?';
   }
 
+  get totalUnreadMessages(): number {
+    const dm    = this.personalConversations.reduce((s, c) => s + (c.unreadCount ?? 0), 0);
+    const group = Object.values(this.groupRoomUnreadCounts).reduce((s, n) => s + n, 0);
+    return dm + group;
+  }
+
   ngOnInit(): void {
     this.displayName = this.authService.getDisplayName();
     this.userService.getMyProfile().subscribe({
       next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
     });
+    this.loadDiscoverySections();
     this.loadGenres();
+    this.loadPersonalChats();
+    this.loadGroupUnreadCounts();
     this.route.queryParams.subscribe(params => {
       if (params['q']) {
         this.searchQuery = params['q'];
@@ -58,6 +75,29 @@ export class LibraryComponent implements OnInit {
       }
     });
   }
+
+  // ── Discovery ───────────────────────────────────────────────────────────
+
+  loadDiscoverySections(): void {
+    this.isLoadingDiscovery = true;
+    this.bookService.getMyShelf().subscribe({
+      next: (items) => {
+        this.continueReading = items.filter(i => i.status === 'READING').slice(0, 6);
+        this.isLoadingDiscovery = false;
+      },
+      error: () => { this.isLoadingDiscovery = false; }
+    });
+    this.bookService.getForYouBooks().subscribe({
+      next: (books) => this.forYouBooks = books.slice(0, 6),
+      error: () => {}
+    });
+    this.bookService.getTrendingBooks().subscribe({
+      next: (books) => this.trendingBooks = books.slice(0, 6),
+      error: () => {}
+    });
+  }
+
+  // ── Books grid ──────────────────────────────────────────────────────────
 
   loadAllBooks(): void {
     this.isLoading = true;
@@ -106,13 +146,11 @@ export class LibraryComponent implements OnInit {
 
   goToBook(id: number): void { this.router.navigate(['/books', id]); }
 
-  openChat(): void {
-    this.showChatSelector = true;
-    this.chatSection = 'group';
-    this.loadPersonalChats();
-  }
+  // ── Navigation ──────────────────────────────────────────────────────────
 
-  closeChatSelector(): void { this.showChatSelector = false; }
+  goToChat(): void { this.router.navigate(['/chat', 'general']); }
+
+  // ── Unread badge ────────────────────────────────────────────────────────
 
   loadPersonalChats(): void {
     this.chatService.getPersonalConversations().subscribe({
@@ -121,17 +159,16 @@ export class LibraryComponent implements OnInit {
     });
   }
 
-  avatarLetter(name: string): string {
-    return name ? name.charAt(0).toUpperCase() : '?';
+  loadGroupUnreadCounts(): void {
+    this.chatService.getGroupUnreadCounts().subscribe({
+      next: (counts) => this.groupRoomUnreadCounts = counts,
+      error: () => {}
+    });
   }
 
-  goToChat(roomId: string): void {
-    this.showChatSelector = false;
-    this.router.navigate(['/chat', roomId]);
-  }
+  // ── Helpers ─────────────────────────────────────────────────────────────
 
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/login']);
-  }
+  avatarLetter(name: string): string { return name ? name.charAt(0).toUpperCase() : '?'; }
+
+  logout(): void { this.authService.logout(); this.router.navigate(['/login']); }
 }

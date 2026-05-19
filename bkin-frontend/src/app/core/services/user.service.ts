@@ -54,6 +54,12 @@ export class UserService {
     return this.http.get<UserProfile>(`${this.base}/users/${username}`);
   }
 
+  getProfileByDisplayName(displayName: string): Observable<UserProfile> {
+    return this.http.get<UserProfile>(
+      `${this.base}/users/by-display/${encodeURIComponent(displayName)}`
+    );
+  }
+
   updateProfile(payload: UpdateProfilePayload): Observable<UserProfile> {
     return this.http.put<UserProfile>(`${this.base}/users/me`, payload);
   }

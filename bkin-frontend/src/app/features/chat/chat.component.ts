@@ -289,6 +289,11 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   // Helpers
   // ─────────────────────────────────────────────────────────────────────────
 
+  goToUserProfile(username: string): void {
+    if (username === this.currentUsername) { this.router.navigate(['/profile']); return; }
+    this.router.navigate(['/users', username]);
+  }
+
   avatarLetter(name: string): string {
     return name ? name.charAt(0).toUpperCase() : '?';
   }

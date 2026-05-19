@@ -249,17 +249,25 @@
              ? 'flex justify-end items-end gap-2'
              : 'flex justify-start items-end gap-2'">
 
-        <!-- Other user avatar -->
-        <div *ngIf="msg.senderUsername !== currentUsername"
-             class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
-                 flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden relative">
-          <span *ngIf="msg.senderUsername === 'BookBot'">👻</span>
-          <span *ngIf="msg.senderUsername !== 'BookBot'">{{ avatarLetter(msg.senderDisplayName) }}</span>
-          <img *ngIf="msg.senderUsername !== 'BookBot' && msg.senderProfilePictureUrl"
-               [src]="msg.senderProfilePictureUrl"
-               class="absolute inset-0 w-full h-full object-cover"
-               onerror="this.style.display='none'" />
-        </div>
+        <!-- Other user avatar (clickable → profile for real users) -->
+        <ng-container *ngIf="msg.senderUsername !== currentUsername">
+          <div *ngIf="msg.senderUsername === 'BookBot'"
+               class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
+                   flex items-center justify-center text-xs font-bold flex-shrink-0 mb-0.5">
+            <span>👻</span>
+          </div>
+          <button *ngIf="msg.senderUsername !== 'BookBot'"
+               (click)="goToUserProfile(msg.senderUsername)"
+               class="w-6 h-6 sm:w-7 sm:h-7 rounded-full bg-surface-300 border border-surface-400
+                   flex items-center justify-center text-crimson text-xs font-bold flex-shrink-0 mb-0.5 overflow-hidden relative
+                   hover:opacity-80 transition-opacity">
+            <span>{{ avatarLetter(msg.senderDisplayName) }}</span>
+            <img *ngIf="msg.senderProfilePictureUrl"
+                 [src]="msg.senderProfilePictureUrl"
+                 class="absolute inset-0 w-full h-full object-cover"
+                 onerror="this.style.display='none'" />
+          </button>
+        </ng-container>
 
         <!-- Message bubble + delete button (own messages only) -->
         <div class="flex items-end gap-1"
@@ -284,10 +292,11 @@
               'bg-obsidian border border-crimson shadow-[0_0_10px_rgba(220,20,60,0.3)] text-white rounded-2xl rounded-bl-sm': msg.senderUsername === 'BookBot'
             }"
                class="px-3 sm:px-4 py-2 sm:py-2.5 shadow-sm max-w-[75%] sm:max-w-xs lg:max-w-md">
-            <p *ngIf="msg.senderUsername !== currentUsername && !isDmRoom"
-               class="text-crimson text-[11px] font-semibold mb-1 leading-tight">
+            <button *ngIf="msg.senderUsername !== currentUsername && !isDmRoom"
+               (click)="goToUserProfile(msg.senderUsername)"
+               class="text-crimson text-[11px] font-semibold mb-1 leading-tight block hover:underline">
               {{ msg.senderDisplayName }}
-            </p>
+            </button>
             <p class="text-sm leading-relaxed break-words">{{ msg.content }}</p>
             <div class="flex items-center justify-end gap-1 mt-1">
               <span class="text-[10px] opacity-60 whitespace-nowrap">
