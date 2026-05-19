@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -276,5 +277,24 @@ public class ChatController {
     public ResponseEntity<Void> markRoomAsRead(@PathVariable String roomId, Principal principal) {
         messageRepository.markRoomMessagesAsRead(roomId, principal.getName());
         return ResponseEntity.noContent().build();
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // GROUP ROOM UNREAD COUNTS
+    // ─────────────────────────────────────────────────────────────────────────
+
+    @GetMapping("/api/chat/group/unread")
+    @ResponseBody
+    @Transactional
+    public ResponseEntity<Map<String, Long>> getGroupUnreadCounts(Principal principal) {
+        String username = principal.getName();
+        List<String> groupRooms =
+            List.of("general", "fiction", "mystery", "sci-fi", "fantasy", "thriller");
+        Map<String, Long> counts = new LinkedHashMap<>();
+        for (String room : groupRooms) {
+            long count = messageRepository.countUnreadInRoom(room, username);
+            counts.put(room, count);
+        }
+        return ResponseEntity.ok(counts);
     }
 }

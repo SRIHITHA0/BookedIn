@@ -12,6 +12,7 @@ public class MessageResponseDto {
     private String content;
     private String type;
     private String sentAt;   // ISO-8601 string — never an array
+    private boolean isRead;
 
     public static MessageResponseDto from(Message msg) {
         MessageResponseDto dto = new MessageResponseDto();
@@ -27,6 +28,7 @@ public class MessageResponseDto {
         dto.content = msg.getContent();
         dto.type = msg.getMessageType().name();
         dto.sentAt = msg.getSentAt().toString() + "Z";
+        dto.isRead = Boolean.TRUE.equals(msg.getIsRead());
         return dto;
     }
 
@@ -38,4 +40,5 @@ public class MessageResponseDto {
     public String getContent() { return content; }
     public String getType() { return type; }
     public String getSentAt() { return sentAt; }
+    public boolean isRead() { return isRead; }
 }

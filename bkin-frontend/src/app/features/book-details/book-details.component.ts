@@ -21,9 +21,10 @@ export class BookDetailsComponent implements OnInit {
   userRating     = 0;
   userReview     = '';
   readingStatus  = '';
-  isInShelf      = false;
-  reviewSuccess  = false;
-  hoverRating    = 0;
+  isInShelf          = false;
+  reviewSuccess      = false;
+  isSubmittingReview = false;
+  hoverRating        = 0;
   stars          = [1, 2, 3, 4, 5];
   reviews:       ReviewResponse[] = [];
   currentUsername = '';
@@ -87,14 +88,18 @@ export class BookDetailsComponent implements OnInit {
   clearHover(): void               { this.hoverRating = 0; }
 
   submitReview(): void {
-    if (!this.book || this.userRating === 0) return;
+    if (!this.book || this.userRating === 0 || this.isSubmittingReview) return;
+    this.isSubmittingReview = true;
+    this.reviewSuccess = false;
     this.bookService.submitReview(this.book.id, this.userRating, this.userReview).subscribe({
       next: () => {
+        this.isSubmittingReview = false;
         this.userReview = '';
         this.reviewSuccess = true;
-        setTimeout(() => this.reviewSuccess = false, 3000);
+        setTimeout(() => this.reviewSuccess = false, 5000);
         this.loadReviews(this.book!.id);
-      }
+      },
+      error: () => { this.isSubmittingReview = false; }
     });
   }
 

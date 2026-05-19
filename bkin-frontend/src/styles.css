@@ -40,6 +40,23 @@
   .genre-tag-inactive { @apply bg-transparent text-gray-500 border-surface-400 hover:border-crimson/50 hover:text-gray-700; }
 }
 
+/* ─── Review success thumbs-up animation ─────────────────────────────────── */
+@keyframes thumbsUpPop {
+  0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+  60%  { transform: scale(1.35) rotate(8deg);  opacity: 1; }
+  80%  { transform: scale(0.9)  rotate(-3deg); opacity: 1; }
+  100% { transform: scale(1)    rotate(0deg);  opacity: 1; }
+}
+@keyframes thumbsUpFade {
+  0%, 70% { opacity: 1; }
+  100%     { opacity: 0; }
+}
+.animate-thumbsup {
+  animation:
+    thumbsUpPop  0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
+    thumbsUpFade 5s ease forwards;
+}
+
 /* ─── Global text overrides for light theme ──────────────────────────────── */
 .text-white       { color: #111827 !important; }
 .text-gray-200    { color: #374151 !important; }

@@ -26,13 +26,10 @@ export class HomeComponent implements OnInit {
   isSearchLoading       = false;
   displayName           = '';
   myProfilePicUrl       = '';
-  showChatSelector      = false;
   showMobileSearch      = false;
   showMobileMenu        = false;
-  chatSection           = 'group';
   personalConversations: Conversation[] = [];
-
-  readonly chatRooms = ['general', 'fiction', 'mystery', 'sci-fi', 'fantasy', 'thriller'];
+  groupRoomUnreadCounts: { [room: string]: number } = {};
 
   constructor(
     private bookService: BookService,
@@ -47,7 +44,9 @@ export class HomeComponent implements OnInit {
   }
 
   get totalUnreadMessages(): number {
-    return this.personalConversations.reduce((sum, c) => sum + (c.unreadCount ?? 0), 0);
+    const dm    = this.personalConversations.reduce((s, c) => s + (c.unreadCount ?? 0), 0);
+    const group = Object.values(this.groupRoomUnreadCounts).reduce((s, n) => s + n, 0);
+    return dm + group;
   }
 
   ngOnInit(): void {
@@ -59,8 +58,9 @@ export class HomeComponent implements OnInit {
     this.userService.getMyProfile().subscribe({
       next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
     });
-    // Load DM conversations on init so the unread badge is populated immediately
+    // Load DM + group unread counts so the badge is populated immediately
     this.loadPersonalChats();
+    this.loadGroupUnreadCounts();
   }
 
   loadTrendingBooks(): void {
@@ -112,14 +112,10 @@ export class HomeComponent implements OnInit {
 
   goToBook(id: number): void { this.router.navigate(['/books', id]); }
 
-  openChat(): void {
-    this.showChatSelector = true;
+  goToChat(): void {
     this.showMobileMenu = false;
-    this.chatSection = 'group';
-    this.loadPersonalChats();
+    this.router.navigate(['/chat', 'general']);
   }
-
-  closeChatSelector(): void { this.showChatSelector = false; }
 
   loadPersonalChats(): void {
     this.chatService.getPersonalConversations().subscribe({
@@ -128,13 +124,15 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  avatarLetter(name: string): string {
-    return name ? name.charAt(0).toUpperCase() : '?';
+  loadGroupUnreadCounts(): void {
+    this.chatService.getGroupUnreadCounts().subscribe({
+      next: (counts) => this.groupRoomUnreadCounts = counts,
+      error: () => {}
+    });
   }
 
-  goToChat(roomId: string): void {
-    this.showChatSelector = false;
-    this.router.navigate(['/chat', roomId]);
+  avatarLetter(name: string): string {
+    return name ? name.charAt(0).toUpperCase() : '?';
   }
 
   logout(): void {

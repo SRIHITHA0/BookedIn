@@ -6,4 +6,5 @@ export interface ChatMessage {
   senderDisplayName: string;
   senderProfilePictureUrl?: string | null;
   sentAt: string;
+  isRead?: boolean;
 }

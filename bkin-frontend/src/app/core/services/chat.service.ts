@@ -70,7 +70,8 @@ export class ChatService {
               senderUsername:           raw.senderUsername,
               senderDisplayName:        raw.senderDisplayName,
               senderProfilePictureUrl:  this.resolveAvatar(raw.senderProfilePictureUrl),
-              sentAt:                   raw.sentAt
+              sentAt:                   raw.sentAt,
+              isRead:                   false   // newly received messages are unread for the recipient
             };
             this.messageSubject.next(chatMsg);
           } catch { /* ignore malformed frames */ }
@@ -133,6 +134,13 @@ export class ChatService {
   /** Mark all messages in a room as read for the current user. */
   markRoomAsRead(roomId: string): Observable<void> {
     return this.http.put<void>(`${environment.apiUrl}/api/chat/${roomId}/read`, {});
+  }
+
+  /** Unread message counts for each group room. */
+  getGroupUnreadCounts(): Observable<{ [room: string]: number }> {
+    return this.http.get<{ [room: string]: number }>(
+      `${environment.apiUrl}/api/chat/group/unread`
+    );
   }
 
   disconnect(): void {

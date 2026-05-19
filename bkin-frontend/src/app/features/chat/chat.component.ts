@@ -34,6 +34,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   sidebarOpen = false;
   personalSearchQuery = '';
+  groupRoomUnreadCounts: { [room: string]: number } = {};
 
   // ── Block state (only relevant in DM rooms) ──────────────────────────────
   isDmPartnerBlocked = false;
@@ -67,6 +68,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       next: (p) => this.currentProfilePicUrl = p.profilePictureUrl ?? ''
     });
     this.loadPersonalConversations();
+    this.loadGroupUnreadCounts();
 
     this.paramSub = this.route.paramMap.subscribe(params => {
       const newRoomId = params.get('roomId') ?? 'general';
@@ -96,14 +98,24 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       error: () => { this.isLoadingHistory = false; }
     });
 
-    // Mark this room's messages as read so the badge clears
-    this.chatService.markRoomAsRead(newRoomId).subscribe({ error: () => {} });
+    // Mark this room's messages as read and clear local badge count
+    this.chatService.markRoomAsRead(newRoomId).subscribe({
+      next: () => { this.clearLocalUnreadCount(newRoomId); },
+      error: () => {}
+    });
 
     // Subscribe to new messages
     this.msgSub = this.chatService.connect(this.roomId).subscribe(msg => {
       this.messages.push(msg);
       this.shouldScroll = true;
       if (this.isDmRoom) this.loadPersonalConversations();
+      // Auto-mark as read if the user is actively viewing this room
+      if (msg.senderUsername !== this.currentUsername) {
+        this.chatService.markRoomAsRead(this.roomId).subscribe({
+          next: () => { this.clearLocalUnreadCount(this.roomId); },
+          error: () => {}
+        });
+      }
     });
 
     // Subscribe to deletion events — remove the message from the list
@@ -126,6 +138,40 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       next: (convs) => this.personalConversations = convs,
       error: () => {}
     });
+  }
+
+  loadGroupUnreadCounts(): void {
+    this.chatService.getGroupUnreadCounts().subscribe({
+      next: (counts) => this.groupRoomUnreadCounts = counts,
+      error: () => {}
+    });
+  }
+
+  /** Clear the unread badge for a room after entering/marking as read. */
+  private clearLocalUnreadCount(roomId: string): void {
+    if (roomId.startsWith('dm_')) {
+      const conv = this.personalConversations.find(c => c.roomId === roomId);
+      if (conv) conv.unreadCount = 0;
+    } else {
+      this.groupRoomUnreadCounts[roomId] = 0;
+    }
+  }
+
+  /** Mark a room as read directly from the sidebar (without opening it). */
+  markAsReadFromSidebar(roomId: string, event: Event): void {
+    event.stopPropagation();
+    this.chatService.markRoomAsRead(roomId).subscribe({
+      next: () => { this.clearLocalUnreadCount(roomId); },
+      error: () => {}
+    });
+  }
+
+  /** Unread count for a given room (group or DM). */
+  unreadCountForRoom(roomId: string): number {
+    if (roomId.startsWith('dm_')) {
+      return this.personalConversations.find(c => c.roomId === roomId)?.unreadCount ?? 0;
+    }
+    return this.groupRoomUnreadCounts[roomId] ?? 0;
   }
 
   get isDmRoom(): boolean  { return this.roomId.startsWith('dm_'); }
