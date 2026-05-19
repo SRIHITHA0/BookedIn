@@ -396,11 +396,11 @@
             </div>
             <div class="flex gap-2">
               <input [(ngModel)]="post.newCommentText" (keyup.enter)="submitComment(post)"
-                placeholder="Write a comment..." [disabled]="post.isSubmittingComment"
+                placeholder="Write a comment..." [disabled]="!!post.isSubmittingComment"
                 class="flex-1 bg-surface-100 border border-surface-300 text-white text-xs placeholder-gray-600
                        rounded-full px-3 py-2 focus:outline-none focus:border-crimson transition-all" />
               <button (click)="submitComment(post)"
-                [disabled]="!post.newCommentText?.trim() || post.isSubmittingComment"
+                [disabled]="!post.newCommentText?.trim() || !!post.isSubmittingComment"
                 class="bg-crimson hover:bg-crimson-hover disabled:opacity-40 text-white rounded-full px-3 py-1.5 text-xs font-medium transition-all">
                 Post
               </button>
