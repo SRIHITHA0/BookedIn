@@ -15,6 +15,7 @@ public class PostResponse {
     private String authorProfilePicUrl;
     private String content;
     private String imageUrl;
+    private String mediaType;   // "image" | "video" | null
     private long likeCount;
     private long commentCount;
     private boolean likedByMe;
@@ -35,9 +36,18 @@ public class PostResponse {
             ? "/api/users/" + post.getAuthor().getUsername() + "/avatar" : null;
         r.content = post.getContent();
         if (post.getImageUrl() != null) {
-            r.imageUrl = post.getImageUrl().startsWith("data:")
-                ? "/api/posts/" + post.getId() + "/image"
-                : post.getImageUrl();
+            String raw = post.getImageUrl();
+            if (raw.startsWith("data:")) {
+                boolean isVideo = raw.startsWith("data:video/");
+                r.imageUrl   = "/api/posts/" + post.getId() + "/image";
+                r.mediaType  = isVideo ? "video" : "image";
+            } else {
+                r.imageUrl  = raw;
+                String lower = raw.toLowerCase();
+                r.mediaType = (lower.contains(".mp4") || lower.contains(".webm")
+                             || lower.contains(".ogg") || lower.contains(".mov")
+                             || lower.contains(".avi")) ? "video" : "image";
+            }
         }
         r.likeCount  = likeRepo.countByPostId(post.getId());
         r.commentCount = commentRepo.countByPostId(post.getId());
@@ -57,6 +67,7 @@ public class PostResponse {
     public String getAuthorProfilePicUrl() { return authorProfilePicUrl; }
     public String getContent() { return content; }
     public String getImageUrl() { return imageUrl; }
+    public String getMediaType() { return mediaType; }
     public long getLikeCount() { return likeCount; }
     public long getCommentCount() { return commentCount; }
     public boolean isLikedByMe() { return likedByMe; }

@@ -339,7 +339,8 @@
               <p class="text-white text-sm leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
             </div>
             <img *ngIf="post.imageUrl" [src]="post.imageUrl"
-              class="w-full max-h-72 object-cover" onerror="this.style.display='none'" />
+              class="w-full max-h-72 object-contain bg-surface-200"
+              onerror="this.style.display='none'" />
           </ng-container>
 
           <!-- Action bar -->

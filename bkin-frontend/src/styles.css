@@ -25,7 +25,7 @@
            rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-crimson
            focus:ring-1 focus:ring-crimson/30 transition-all duration-200;
   }
-  .bkin-error  { @apply text-crimson text-xs mt-1 block; }
+  .bkin-error  { @apply text-red-500 text-xs mt-1 block; }
   .bkin-btn-primary {
     @apply w-full bg-crimson hover:bg-crimson-hover disabled:opacity-50 disabled:cursor-not-allowed
            text-white font-semibold rounded-lg py-3 text-sm tracking-wide
@@ -55,6 +55,23 @@
   animation:
     thumbsUpPop  0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards,
     thumbsUpFade 5s ease forwards;
+}
+
+/* ─── Trending books vertical auto-scroll ticker ─────────────────────────── */
+@keyframes scrollTicker {
+  0%   { transform: translateY(0); }
+  100% { transform: translateY(-50%); }
+}
+.trending-ticker-wrap {
+  overflow: hidden;
+  position: relative;
+}
+.trending-ticker {
+  animation: scrollTicker linear infinite;
+  will-change: transform;
+}
+.trending-ticker:hover {
+  animation-play-state: paused;
 }
 
 /* ─── Global text overrides for light theme ──────────────────────────────── */

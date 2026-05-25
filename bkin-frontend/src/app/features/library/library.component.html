@@ -133,34 +133,6 @@
       </div>
     </ng-container>
 
-    <!-- ── Trending Now ── -->
-    <ng-container *ngIf="trendingBooks.length > 0">
-      <h2 class="text-white text-base sm:text-lg font-semibold mb-3 flex items-center gap-2">
-        <span class="w-1 h-5 bg-crimson rounded-full inline-block"></span>
-        Trending Now
-        <span class="text-xs text-gray-600 font-normal">🔥</span>
-      </h2>
-      <div class="flex gap-3 overflow-x-auto pb-3 mb-6 scrollbar-none">
-        <div *ngFor="let book of trendingBooks; let i = index" (click)="goToBook(book.id)"
-          class="flex-shrink-0 w-28 sm:w-32 bkin-card cursor-pointer group">
-          <div class="relative aspect-[2/3] bg-surface-200 overflow-hidden">
-            <img [src]="book.coverImageUrl" [alt]="book.title"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              onerror="this.onerror=null;this.src='https://placehold.co/150x225/E2EAFF/2B6EE8?text=BookedIn'" />
-            <div class="absolute top-1.5 left-1.5">
-              <span class="bg-crimson text-white text-[9px] font-bold px-1.5 py-0.5 rounded">
-                #{{ i + 1 }}
-              </span>
-            </div>
-          </div>
-          <div class="p-2">
-            <h3 class="text-white text-[11px] font-semibold line-clamp-2 leading-tight mb-0.5">{{ book.title }}</h3>
-            <p class="text-gray-500 text-[10px] line-clamp-1">{{ book.author }}</p>
-          </div>
-        </div>
-      </div>
-    </ng-container>
-
     <!-- ── Genre Filter Bar ── -->
     <div class="flex items-center gap-2 overflow-x-auto pb-2 mb-5 scrollbar-none">
       <button (click)="filterByGenre('all')"

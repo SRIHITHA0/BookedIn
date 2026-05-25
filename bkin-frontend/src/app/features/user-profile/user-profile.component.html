@@ -109,8 +109,9 @@
         <div class="px-4 pb-3">
           <p class="text-white text-sm leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
         </div>
-        <!-- Image -->
-        <img *ngIf="post.imageUrl" [src]="post.imageUrl" class="w-full max-h-80 object-cover"
+        <!-- Post image -->
+        <img *ngIf="post.imageUrl" [src]="post.imageUrl"
+          class="w-full max-h-80 object-contain bg-surface-200"
           onerror="this.style.display='none'" />
 
         <!-- Actions -->

@@ -68,6 +68,14 @@ export class UserService {
     return this.http.get<ShelfItem[]>(`${this.base}/shelf`);
   }
 
+  searchUsers(q: string): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(`${this.base}/users/search`, { params: { q } });
+  }
+
+  getSuggestedUsers(): Observable<UserProfile[]> {
+    return this.http.get<UserProfile[]>(`${this.base}/users/suggested`);
+  }
+
   blockUser(username: string): Observable<void> {
     return this.http.post<void>(`${this.base}/users/${username}/block`, {});
   }

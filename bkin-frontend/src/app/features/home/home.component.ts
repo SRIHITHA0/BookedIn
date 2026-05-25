@@ -1,17 +1,19 @@
 import { Component, OnInit, ElementRef, ViewChild } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { UserService } from '../../core/services/user.service';
+import { UserService, UserProfile } from '../../core/services/user.service';
+import { BookService } from '../../core/services/book.service';
 import { ChatService, Conversation } from '../../core/services/chat.service';
 import { PostService } from '../../core/services/post.service';
 import { Post, BkinComment } from '../../models/post.model';
+import { Book } from '../../models/book.model';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, DecimalPipe, FormsModule, RouterModule],
   templateUrl: './home.component.html'
 })
 export class HomeComponent implements OnInit {
@@ -20,7 +22,7 @@ export class HomeComponent implements OnInit {
   displayName        = '';
   currentUsername    = '';
   myProfilePicUrl    = '';
-  showMobileMenu     = false;
+  showMobileMenu     = false;  // kept for future use; hamburger removed from navbar
 
   // ── Unread badge ───────────────────────────────────────────────────────
   personalConversations: Conversation[] = [];
@@ -30,11 +32,20 @@ export class HomeComponent implements OnInit {
   posts: Post[] = [];
   isLoadingPosts = false;
 
+  // ── Left sidebar: user search + suggested users ────────────────────────
+  userSearchQuery   = '';
+  userSearchResults: UserProfile[] = [];
+  isSearchingUsers  = false;
+  suggestedUsers:    UserProfile[] = [];
+
+  // ── Right sidebar: trending books ticker ──────────────────────────────
+  trendingBooks: Book[] = [];
+
   // ── Create / Edit post modal ───────────────────────────────────────────
   showCreateModal  = false;
   newPostContent   = '';
   newPostImageUrl  = '';
-  newPostImageData = '';   // base64 data URI from file upload
+  newPostImageData = '';   // base64 data URI from file upload (compressed)
   showEmojiPicker  = false;
   showImageInput   = false;
   imageInputMode: 'url' | 'upload' = 'url';
@@ -51,6 +62,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private authService: AuthService,
     private userService: UserService,
+    private bookService: BookService,
     private chatService: ChatService,
     private postService: PostService,
     private router: Router
@@ -75,6 +87,53 @@ export class HomeComponent implements OnInit {
     this.loadFeed();
     this.loadPersonalChats();
     this.loadGroupUnreadCounts();
+    this.loadTrendingBooks();
+    this.loadSuggestedUsers();
+  }
+
+  // ── Trending books + Suggested users ──────────────────────────────────
+
+  loadTrendingBooks(): void {
+    this.bookService.getTrendingBooks().subscribe({
+      next: (books) => this.trendingBooks = books,
+      error: () => {}
+    });
+  }
+
+  loadSuggestedUsers(): void {
+    this.userService.getSuggestedUsers().subscribe({
+      next: (users) => this.suggestedUsers = users.filter(u => u.username !== this.currentUsername),
+      error: () => {}
+    });
+  }
+
+  searchUsers(): void {
+    const q = this.userSearchQuery.trim();
+    if (!q) { this.userSearchResults = []; return; }
+    this.isSearchingUsers = true;
+    this.userService.searchUsers(q).subscribe({
+      next: (users) => { this.userSearchResults = users; this.isSearchingUsers = false; },
+      error: () => { this.isSearchingUsers = false; }
+    });
+  }
+
+  clearUserSearch(): void {
+    this.userSearchQuery  = '';
+    this.userSearchResults = [];
+  }
+
+  get trendingBooksDouble(): Book[] {
+    if (this.trendingBooks.length === 0) return [];
+    return [...this.trendingBooks, ...this.trendingBooks];
+  }
+
+  connectWithUser(username: string): void {
+    const roomId = 'dm_' + [this.currentUsername, username].sort().join('_');
+    this.router.navigate(['/chat', roomId]);
+  }
+
+  goToBook(bookId: number): void {
+    this.router.navigate(['/books', bookId]);
   }
 
   // ── Feed ───────────────────────────────────────────────────────────────
@@ -110,10 +169,50 @@ export class HomeComponent implements OnInit {
     const input = event.target as HTMLInputElement;
     const file  = input.files?.[0];
     if (!file) return;
-    if (file.size > 2 * 1024 * 1024) { alert('Image must be under 2 MB'); return; }
+    if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
+    if (file.size > 10 * 1024 * 1024) { alert('Image must be under 10 MB.'); return; }
     const reader = new FileReader();
-    reader.onload = () => { this.newPostImageData = reader.result as string; };
+    reader.onload = () => {
+      this.compressImage(reader.result as string).then(compressed => {
+        this.newPostImageData = compressed;
+      });
+    };
     reader.readAsDataURL(file);
+  }
+
+  onEditImageFile(event: Event, post: Post): void {
+    const input = event.target as HTMLInputElement;
+    const file  = input.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
+    if (file.size > 10 * 1024 * 1024) { alert('Image must be under 10 MB.'); return; }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.compressImage(reader.result as string).then(compressed => {
+        post.editImageData = compressed;
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+
+  /** Resize image to max 1200px and re-encode as JPEG at 85% quality. */
+  private compressImage(dataUri: string, maxDim = 1200, quality = 0.85): Promise<string> {
+    return new Promise(resolve => {
+      const img = new Image();
+      img.onload = () => {
+        let w = img.naturalWidth, h = img.naturalHeight;
+        if (w > maxDim || h > maxDim) {
+          const r = Math.min(maxDim / w, maxDim / h);
+          w = Math.round(w * r); h = Math.round(h * r);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+        resolve(canvas.toDataURL('image/jpeg', quality));
+      };
+      img.onerror = () => resolve(dataUri); // fallback: use original if resize fails
+      img.src = dataUri;
+    });
   }
 
   get resolvedNewPostImage(): string {
@@ -137,9 +236,13 @@ export class HomeComponent implements OnInit {
   // ── Edit post ──────────────────────────────────────────────────────────
 
   startEdit(post: Post): void {
-    post.isEditing   = true;
-    post.editContent = post.content;
-    post.editImageUrl = post.imageUrl ?? '';
+    post.isEditing       = true;
+    post.editContent     = post.content;
+    post.editImageUrl    = '';
+    post.editImageData   = '';
+    post.editImageMode   = 'url';
+    post.editHasMedia    = !!post.imageUrl;
+    post.editRemoveMedia = false;
   }
 
   cancelEdit(post: Post): void { post.isEditing = false; }
@@ -147,7 +250,27 @@ export class HomeComponent implements OnInit {
   saveEdit(post: Post): void {
     const content = (post.editContent ?? '').trim();
     if (!content) return;
-    this.postService.editPost(post.id, content, post.editImageUrl || null).subscribe({
+
+    // Determine what to send for imageUrl:
+    // • Remove requested        → null  (clear media)
+    // • New file uploaded       → compressed base64 data URI
+    // • New URL entered         → that URL
+    // • Had media, no change    → undefined (omit, backend keeps existing)
+    // • No media, nothing new   → null
+    let imageUrl: string | null | undefined;
+    if (post.editRemoveMedia) {
+      imageUrl = null;
+    } else if (post.editImageMode === 'upload' && post.editImageData) {
+      imageUrl = post.editImageData;
+    } else if (post.editImageUrl?.trim()) {
+      imageUrl = post.editImageUrl.trim();
+    } else if (post.editHasMedia) {
+      imageUrl = undefined;   // keep existing — backend won't touch it
+    } else {
+      imageUrl = null;
+    }
+
+    this.postService.editPost(post.id, content, imageUrl).subscribe({
       next: (updated) => {
         const idx = this.posts.findIndex(p => p.id === post.id);
         if (idx !== -1) {
@@ -213,7 +336,6 @@ export class HomeComponent implements OnInit {
   }
 
   goToChat(): void {
-    this.showMobileMenu = false;
     this.router.navigate(['/chat', 'general']);
   }
 

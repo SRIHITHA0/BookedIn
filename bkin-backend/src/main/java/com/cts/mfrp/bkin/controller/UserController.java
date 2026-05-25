@@ -16,7 +16,9 @@ import org.springframework.web.bind.annotation.*;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.Base64;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/users")
@@ -78,6 +80,26 @@ public class UserController {
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
+    }
+
+    @GetMapping("/search")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<UserProfileDto>> searchUsers(@RequestParam(value = "q", defaultValue = "") String q) {
+        if (q.isBlank()) return ResponseEntity.ok(List.of());
+        List<User> users = userRepository.searchByUsernameOrDisplayName(q.trim());
+        return ResponseEntity.ok(users.stream().map(UserProfileDto::from).collect(Collectors.toList()));
+    }
+
+    @GetMapping("/suggested")
+    @Transactional(readOnly = true)
+    public ResponseEntity<List<UserProfileDto>> getSuggestedUsers(Principal principal) {
+        User me = userRepository.findByUsernameWithInterests(principal.getName())
+            .orElseThrow(() -> new RuntimeException("User not found"));
+        if (me.getInterests() == null || me.getInterests().isEmpty()) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<User> suggested = userRepository.findSuggestedUsers(me.getInterests(), principal.getName());
+        return ResponseEntity.ok(suggested.stream().limit(10).map(UserProfileDto::from).collect(Collectors.toList()));
     }
 
     @PutMapping("/me")
