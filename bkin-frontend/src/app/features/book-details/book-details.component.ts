@@ -24,6 +24,7 @@ export class BookDetailsComponent implements OnInit {
   isInShelf          = false;
   reviewSuccess      = false;
   isSubmittingReview = false;
+  isDeletingReview   = false;
   hoverRating        = 0;
   stars          = [1, 2, 3, 4, 5];
   reviews:       ReviewResponse[] = [];
@@ -108,13 +109,16 @@ export class BookDetailsComponent implements OnInit {
   }
 
   deleteReview(): void {
-    if (!this.book) return;
+    if (!this.book || this.isDeletingReview) return;
+    this.isDeletingReview = true;
     this.bookService.deleteReview(this.book.id).subscribe({
       next: () => {
         this.userRating = 0;
         this.userReview = '';
+        this.isDeletingReview = false;
         this.loadReviews(this.book!.id);
-      }
+      },
+      error: () => { this.isDeletingReview = false; }
     });
   }
 

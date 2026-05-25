@@ -182,14 +182,17 @@
         </svg>
       </button>
 
-      <div *ngIf="isDmRoom"
+      <button *ngIf="isDmRoom"
+           (click)="goToUserProfile(dmPartnerUsername)"
+           title="View profile"
            class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-crimson/20 border border-crimson/40
-               flex items-center justify-center text-crimson font-bold flex-shrink-0 overflow-hidden relative">
+               flex items-center justify-center text-crimson font-bold flex-shrink-0 overflow-hidden relative
+               hover:opacity-75 transition-opacity">
         <span>{{ avatarLetter(roomDisplayName) }}</span>
         <img *ngIf="dmPartnerProfilePic" [src]="dmPartnerProfilePic"
              class="absolute inset-0 w-full h-full object-cover"
              onerror="this.style.display='none'" />
-      </div>
+      </button>
       <div *ngIf="!isDmRoom"
            class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-surface-300
                flex items-center justify-center text-base flex-shrink-0">

@@ -31,6 +31,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   private deletionSub!: Subscription;
   private paramSub!: Subscription;
   private shouldScroll = false;
+  private readReceiptInterval: ReturnType<typeof setInterval> | null = null;
 
   sidebarOpen = false;
   personalSearchQuery = '';
@@ -82,6 +83,12 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.msgSub?.unsubscribe();
     this.deletionSub?.unsubscribe();
 
+    // Stop previous read-receipt polling
+    if (this.readReceiptInterval) {
+      clearInterval(this.readReceiptInterval);
+      this.readReceiptInterval = null;
+    }
+
     this.roomId  = newRoomId;
     this.messages = [];
     this.newMessage = '';
@@ -123,14 +130,32 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       this.messages = this.messages.filter(m => m.id !== deletedId);
     });
 
-    // Load block status when entering a DM room
+    // Load block status when entering a DM room, and start polling read receipts
     if (newRoomId.startsWith('dm_')) {
       this.dmPartnerUsername = this.resolveDmPartner(newRoomId);
       this.userService.isBlocked(this.dmPartnerUsername).subscribe({
         next: (blocked) => { this.isDmPartnerBlocked = blocked; },
         error: () => {}
       });
+      // Poll every 8 seconds to update isRead flags when the partner reads messages
+      this.readReceiptInterval = setInterval(() => this.refreshReadReceipts(), 8000);
     }
+  }
+
+  /** Re-fetch history silently to update isRead flags on own sent messages. */
+  private refreshReadReceipts(): void {
+    if (!this.isDmRoom) return;
+    this.chatService.getHistory(this.roomId).subscribe({
+      next: (history) => {
+        (history as any[]).forEach(hMsg => {
+          const existing = this.messages.find(m => m.id === hMsg.id);
+          if (existing && existing.isRead !== hMsg.isRead) {
+            existing.isRead = hMsg.isRead;
+          }
+        });
+      },
+      error: () => {}
+    });
   }
 
   loadPersonalConversations(): void {
@@ -309,6 +334,7 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
     this.msgSub?.unsubscribe();
     this.deletionSub?.unsubscribe();
     this.paramSub?.unsubscribe();
+    if (this.readReceiptInterval) clearInterval(this.readReceiptInterval);
     this.chatService.disconnect();
   }
 }
