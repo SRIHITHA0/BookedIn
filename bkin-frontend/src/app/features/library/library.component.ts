@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
@@ -15,6 +15,8 @@ import { Book, Genre } from '../../models/book.model';
   templateUrl: './library.component.html'
 })
 export class LibraryComponent implements OnInit {
+
+  @ViewChild('resultsSection') resultsSection!: ElementRef;
 
   // ── All books / search ──────────────────────────────────────────────────
   books:              Book[]  = [];
@@ -121,7 +123,14 @@ export class LibraryComponent implements OnInit {
     this.isLoading = true;
     this.booksError = false;
     this.bookService.searchBooks(q).subscribe({
-      next: (books) => { this.books = books; this.isLoading = false; },
+      next: (books) => {
+        this.books = books;
+        this.isLoading = false;
+        // Scroll to results after Angular renders them
+        setTimeout(() => {
+          this.resultsSection?.nativeElement?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 150);
+      },
       error: () => { this.books = []; this.isLoading = false; this.booksError = true; }
     });
   }

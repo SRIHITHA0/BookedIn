@@ -64,7 +64,7 @@
     <div class="flex gap-4 lg:gap-5 items-start">
 
       <!-- ════════ LEFT SIDEBAR (md 768px+) ════════ -->
-      <aside class="hidden md:flex flex-col gap-3 w-[200px] lg:w-[220px] xl:w-64 flex-shrink-0 sticky top-20">
+      <aside class="hidden md:flex flex-col gap-3 [flex:3] min-w-[180px] max-w-[300px] flex-shrink-0 sticky top-20">
 
         <!-- Search users card -->
         <div class="bg-surface-100 border border-surface-300 rounded-2xl p-3 lg:p-4">
@@ -173,7 +173,7 @@
       </aside>
 
       <!-- ════════ CENTER: Posts feed ════════ -->
-      <main class="flex-1 min-w-0">
+      <main class="[flex:4] min-w-0">
 
         <!-- FIX 2: Mobile-only search + suggested users (< 768px) -->
         <div class="md:hidden mb-4 space-y-3">
@@ -501,7 +501,7 @@
       </main>
 
       <!-- ════════ RIGHT SIDEBAR: Trending ticker (lg 1024px+) ════════ -->
-      <aside class="hidden lg:flex flex-col gap-3 w-[200px] xl:w-56 flex-shrink-0 sticky top-20">
+      <aside class="hidden lg:flex flex-col gap-3 [flex:3] min-w-[180px] max-w-[300px] flex-shrink-0 sticky top-20">
         <div class="bg-surface-100 border border-surface-300 rounded-2xl p-3 lg:p-4 overflow-hidden">
           <h3 class="text-white text-xs lg:text-sm font-semibold mb-3 flex items-center gap-1.5">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-crimson flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">

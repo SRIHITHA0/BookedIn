@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { UserService, ShelfItem } from '../../core/services/user.service';
+import { AuthService } from '../../core/services/auth.service';
 
 @Component({
   selector: 'app-shelf',
@@ -14,14 +15,27 @@ export class ShelfComponent implements OnInit {
   allItems:     ShelfItem[] = [];
   activeTab: string = 'READING';
   isLoading = false;
+  myProfilePicUrl = '';
 
-  constructor(private userService: UserService, private router: Router) {}
+  constructor(
+    private userService: UserService,
+    private authService: AuthService,
+    private router: Router
+  ) {}
+
+  get myAvatarLetter(): string {
+    const name = this.authService.getDisplayName();
+    return name ? name.charAt(0).toUpperCase() : '?';
+  }
 
   ngOnInit(): void {
     this.isLoading = true;
     this.userService.getMyShelf().subscribe({
       next: (items) => { this.allItems = items; this.isLoading = false; },
       error: () => { this.isLoading = false; }
+    });
+    this.userService.getMyProfile().subscribe({
+      next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
     });
   }
 

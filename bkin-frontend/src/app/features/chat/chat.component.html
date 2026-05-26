@@ -301,26 +301,9 @@
               {{ msg.senderDisplayName }}
             </button>
             <p class="text-sm leading-relaxed break-words">{{ msg.content }}</p>
-            <div class="flex items-center justify-end gap-1 mt-1">
+            <div class="flex items-center justify-end mt-1">
               <span class="text-[10px] opacity-60 whitespace-nowrap">
                 {{ msg.sentAt | date:'h:mm a' }}
-              </span>
-              <!-- Read receipt — own messages in DM rooms only -->
-              <span *ngIf="msg.senderUsername === currentUsername && isDmRoom"
-                    [title]="msg.isRead ? 'Seen' : 'Sent'"
-                    class="flex-shrink-0">
-                <!-- Double check (read) -->
-                <svg *ngIf="msg.isRead" xmlns="http://www.w3.org/2000/svg"
-                     class="h-3 w-3 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                        d="M4 12l5 5L20 5M9 17l-4-4"/>
-                </svg>
-                <!-- Single check (sent, unread) -->
-                <svg *ngIf="!msg.isRead" xmlns="http://www.w3.org/2000/svg"
-                     class="h-3 w-3 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
-                        d="M5 13l4 4L19 7"/>
-                </svg>
               </span>
             </div>
           </div>

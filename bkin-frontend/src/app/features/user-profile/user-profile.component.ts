@@ -21,6 +21,11 @@ export class UserProfileComponent implements OnInit {
   notFound   = false;
   currentUsername = '';
   currentDisplayName = '';
+  myProfilePicUrl = '';
+
+  get myAvatarLetter(): string {
+    return this.currentDisplayName ? this.currentDisplayName.charAt(0).toUpperCase() : '?';
+  }
 
   constructor(
     private route: ActivatedRoute,
@@ -33,6 +38,9 @@ export class UserProfileComponent implements OnInit {
   ngOnInit(): void {
     this.currentUsername    = this.authService.getUsername();
     this.currentDisplayName = this.authService.getDisplayName();
+    this.userService.getMyProfile().subscribe({
+      next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
+    });
 
     this.route.paramMap.subscribe(params => {
       const username = params.get('username') ?? '';

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { RouterModule, ActivatedRoute, Router } from '@angular/router';
 import { BookService, ReviewResponse } from '../../core/services/book.service';
 import { AuthService } from '../../core/services/auth.service';
+import { UserService } from '../../core/services/user.service';
 import { Book } from '../../models/book.model';
 
 @Component({
@@ -29,12 +30,19 @@ export class BookDetailsComponent implements OnInit {
   stars          = [1, 2, 3, 4, 5];
   reviews:       ReviewResponse[] = [];
   currentUsername = '';
+  myProfilePicUrl = '';
+
+  get myAvatarLetter(): string {
+    const name = this.authService.getDisplayName();
+    return name ? name.charAt(0).toUpperCase() : '?';
+  }
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private bookService: BookService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -44,6 +52,9 @@ export class BookDetailsComponent implements OnInit {
     this.loadBook(+bookId);
     this.checkShelf(+bookId);
     this.loadReviews(+bookId);
+    this.userService.getMyProfile().subscribe({
+      next: (p) => this.myProfilePicUrl = p.profilePictureUrl ?? ''
+    });
   }
 
   loadBook(id: number): void {

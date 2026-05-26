@@ -1,18 +1,57 @@
 <div class="min-h-screen bg-obsidian">
 
-  <!-- Navbar -->
-  <nav class="sticky top-0 z-50 bg-surface-100/80 backdrop-blur-md border-b border-surface-300 px-4 sm:px-6 py-3 sm:py-4">
-    <div class="max-w-5xl mx-auto flex items-center gap-4">
-      <button (click)="goBack()" class="text-gray-400 hover:text-crimson transition-colors flex-shrink-0">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-      </button>
-      <h1 class="text-white font-semibold text-sm sm:text-base">My Reading Shelf</h1>
-      <a routerLink="/home" class="ml-auto flex items-center gap-2 hover:opacity-80 transition-opacity">
-        <img src="assets/bookedin_logo_transparent.png" alt="" class="h-7 sm:h-8 w-auto" />
-        <span class="text-crimson text-xl font-extrabold tracking-tight">BookedIn</span>
-      </a>
+  <!-- ═══════════ NAVBAR ═══════════ -->
+  <nav class="sticky top-0 z-50 bg-surface-100/80 backdrop-blur-md border-b border-surface-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6">
+      <div class="flex items-center h-14 sm:h-16 gap-1 sm:gap-3">
+
+        <!-- Logo -->
+        <a routerLink="/home" class="flex items-center gap-1.5 flex-shrink-0 hover:opacity-80 transition-opacity mr-1 sm:mr-2">
+          <img src="assets/bookedin_logo_transparent.png" alt="" class="h-7 sm:h-9 w-auto" />
+          <span class="text-crimson text-base sm:text-xl font-extrabold tracking-tight">BookedIn</span>
+        </a>
+
+        <div class="flex-1"></div>
+
+        <!-- Library -->
+        <a routerLink="/library"
+          class="flex items-center gap-1 sm:gap-1.5 text-gray-400 hover:text-white transition-colors text-sm font-medium px-1.5 sm:px-2 py-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          <span class="hidden sm:inline">Library</span>
+        </a>
+
+        <!-- Shelf (active) -->
+        <a routerLink="/shelf"
+          class="flex items-center gap-1 sm:gap-1.5 text-crimson transition-colors text-sm font-medium px-1.5 sm:px-2 py-1">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"/>
+          </svg>
+          <span class="hidden sm:inline">Shelf</span>
+        </a>
+
+        <!-- Chat -->
+        <a routerLink="/chat/general"
+          class="relative flex items-center text-gray-400 hover:text-white transition-colors p-2 rounded-lg hover:bg-surface-200">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+        </a>
+
+        <!-- Profile avatar -->
+        <a routerLink="/profile"
+          class="w-8 h-8 rounded-full bg-crimson/20 border border-crimson/40 flex items-center justify-center
+                 text-crimson text-sm font-bold flex-shrink-0 overflow-hidden hover:border-crimson transition-all"
+          title="My Profile">
+          <img *ngIf="myProfilePicUrl" [src]="myProfilePicUrl"
+            class="w-full h-full object-cover" onerror="this.onerror=null;this.style.display='none'" />
+          <span *ngIf="!myProfilePicUrl">{{ myAvatarLetter }}</span>
+        </a>
+      </div>
     </div>
   </nav>
 
