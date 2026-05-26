@@ -64,7 +64,7 @@ public class SecurityConfig {
         // Use setAllowedOriginPatterns (not setAllowedOrigins) to support wildcards
         config.setAllowedOriginPatterns(List.of(
             "http://localhost:*",
-            "https://booked-in-sample.vercel.app",
+            "https://booked-in-zeta.vercel.app",
             "https://*.vercel.app"
         ));
 
