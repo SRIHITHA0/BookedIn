@@ -60,8 +60,6 @@ export class ProfileComponent implements OnInit {
 
   readonly maxDob = new Date().toISOString().split('T')[0];
 
-  uploadingImage = false;
-
   constructor(
     private userService: UserService,
     private authService: AuthService,
@@ -163,23 +161,6 @@ export class ProfileComponent implements OnInit {
 
   get avatarLetter(): string {
     return this.profile?.displayName ? this.profile.displayName.charAt(0).toUpperCase() : '?';
-  }
-
-  onImageUpload(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file = input.files?.[0];
-    if (!file) return;
-    if (file.size > 2 * 1024 * 1024) {
-      this.errorMessage = 'Image must be under 2 MB.';
-      return;
-    }
-    this.uploadingImage = true;
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.profileForm.patchValue({ profilePictureUrl: reader.result as string });
-      this.uploadingImage = false;
-    };
-    reader.readAsDataURL(file);
   }
 
   // ── Post actions ──────────────────────────────────────────────────────

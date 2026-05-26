@@ -9,12 +9,6 @@
            flex flex-col transition-transform duration-300 ease-in-out">
 
     <div class="px-4 py-4 border-b border-surface-300 flex items-center justify-between">
-      <a routerLink="/home" class="text-gray-400 hover:text-crimson transition-colors flex items-center gap-2 text-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-        </svg>
-        Home
-      </a>
       <a routerLink="/home" class="flex items-center gap-1.5 hover:opacity-80 transition-opacity">
         <img src="assets/bookedin_logo_transparent.png" alt="" class="h-6 w-auto" />
         <span class="text-crimson font-extrabold tracking-tight">BookedIn</span>
@@ -336,20 +330,24 @@
         You have blocked this user. Unblock to send messages.
       </div>
 
-      <div class="flex items-end gap-2 sm:gap-3 max-w-4xl mx-auto">
+      <div class="flex items-center gap-2 sm:gap-3 max-w-4xl mx-auto
+                  bg-surface-200 border border-surface-300 rounded-full px-4 py-2
+                  focus-within:border-crimson transition-all">
         <textarea [(ngModel)]="newMessage" (keydown)="onKeydown($event)"
                   [placeholder]="chatService.connected
             ? (isDmRoom ? 'Message ' + roomDisplayName + '...' : 'Message... (Enter to send)')
             : 'Connecting...'"
                   [disabled]="!chatService.connected || isDmPartnerBlocked"
                   rows="1"
-                  class="flex-1 bkin-input resize-none min-h-[40px] sm:min-h-[44px] max-h-32 leading-relaxed text-sm
-                 disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
+                  class="flex-1 bg-transparent border-none outline-none resize-none
+                         text-white placeholder-gray-600 text-sm leading-relaxed
+                         min-h-[28px] max-h-32 py-1
+                         disabled:opacity-50 disabled:cursor-not-allowed"></textarea>
         <button (click)="sendMessage()"
                 [disabled]="!newMessage.trim() || !chatService.connected || isDmPartnerBlocked"
                 class="bg-crimson hover:bg-crimson-hover disabled:opacity-40 disabled:cursor-not-allowed
-                 text-white rounded-xl p-2.5 sm:p-3 transition-all flex-shrink-0">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-5 sm:w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                       text-white rounded-full p-2 transition-all flex-shrink-0 self-end">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 sm:h-4.5 sm:w-4.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
           </svg>
         </button>
