@@ -36,6 +36,7 @@ export class HomeComponent implements OnInit {
   userSearchQuery   = '';
   userSearchResults: UserProfile[] = [];
   isSearchingUsers  = false;
+  hasSearched       = false;   // true only after the search button/Enter was used
   suggestedUsers:    UserProfile[] = [];
 
   // ── Right sidebar: trending books ticker ──────────────────────────────
@@ -109,17 +110,26 @@ export class HomeComponent implements OnInit {
 
   searchUsers(): void {
     const q = this.userSearchQuery.trim();
-    if (!q) { this.userSearchResults = []; return; }
+    if (!q) { this.userSearchResults = []; this.hasSearched = false; return; }
     this.isSearchingUsers = true;
+    this.hasSearched = true;
     this.userService.searchUsers(q).subscribe({
       next: (users) => { this.userSearchResults = users; this.isSearchingUsers = false; },
       error: () => { this.isSearchingUsers = false; }
     });
   }
 
-  clearUserSearch(): void {
-    this.userSearchQuery  = '';
+  onSearchQueryChange(): void {
+    // Reset the "has searched" flag so "No users found" doesn't flash while typing
+    this.hasSearched = false;
     this.userSearchResults = [];
+    if (this.userSearchQuery.trim() === '') this.clearUserSearch();
+  }
+
+  clearUserSearch(): void {
+    this.userSearchQuery   = '';
+    this.userSearchResults = [];
+    this.hasSearched       = false;
   }
 
   get trendingBooksDouble(): Book[] {
