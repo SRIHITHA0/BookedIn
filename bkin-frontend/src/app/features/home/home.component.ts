@@ -46,10 +46,8 @@ export class HomeComponent implements OnInit {
   showCreateModal  = false;
   newPostContent   = '';
   newPostImageUrl  = '';
-  newPostImageData = '';   // base64 data URI from file upload (compressed)
   showEmojiPicker  = false;
   showImageInput   = false;
-  imageInputMode: 'url' | 'upload' = 'url';
   isCreatingPost   = false;
 
   @ViewChild('postTextarea') postTextarea!: ElementRef<HTMLTextAreaElement>;
@@ -162,10 +160,8 @@ export class HomeComponent implements OnInit {
     this.showCreateModal  = true;
     this.newPostContent   = '';
     this.newPostImageUrl  = '';
-    this.newPostImageData = '';
     this.showEmojiPicker  = false;
     this.showImageInput   = false;
-    this.imageInputMode   = 'url';
   }
 
   closeCreateModal(): void { this.showCreateModal = false; }
@@ -175,64 +171,10 @@ export class HomeComponent implements OnInit {
     this.showEmojiPicker = false;
   }
 
-  onImageFile(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    const file  = input.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
-    if (file.size > 10 * 1024 * 1024) { alert('Image must be under 10 MB.'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.compressImage(reader.result as string).then(compressed => {
-        this.newPostImageData = compressed;
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-
-  onEditImageFile(event: Event, post: Post): void {
-    const input = event.target as HTMLInputElement;
-    const file  = input.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { alert('Please select an image file.'); return; }
-    if (file.size > 10 * 1024 * 1024) { alert('Image must be under 10 MB.'); return; }
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.compressImage(reader.result as string).then(compressed => {
-        post.editImageData = compressed;
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-
-  /** Resize image to max 1200px and re-encode as JPEG at 85% quality. */
-  private compressImage(dataUri: string, maxDim = 1200, quality = 0.85): Promise<string> {
-    return new Promise(resolve => {
-      const img = new Image();
-      img.onload = () => {
-        let w = img.naturalWidth, h = img.naturalHeight;
-        if (w > maxDim || h > maxDim) {
-          const r = Math.min(maxDim / w, maxDim / h);
-          w = Math.round(w * r); h = Math.round(h * r);
-        }
-        const canvas = document.createElement('canvas');
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
-        resolve(canvas.toDataURL('image/jpeg', quality));
-      };
-      img.onerror = () => resolve(dataUri); // fallback: use original if resize fails
-      img.src = dataUri;
-    });
-  }
-
-  get resolvedNewPostImage(): string {
-    return this.imageInputMode === 'upload' ? this.newPostImageData : this.newPostImageUrl;
-  }
-
   submitPost(): void {
     if (!this.newPostContent.trim() || this.isCreatingPost) return;
     this.isCreatingPost = true;
-    const imageUrl = this.resolvedNewPostImage || undefined;
+    const imageUrl = this.newPostImageUrl.trim() || undefined;
     this.postService.createPost(this.newPostContent.trim(), imageUrl).subscribe({
       next: (post) => {
         this.posts = [post, ...this.posts];
@@ -249,8 +191,6 @@ export class HomeComponent implements OnInit {
     post.isEditing       = true;
     post.editContent     = post.content;
     post.editImageUrl    = '';
-    post.editImageData   = '';
-    post.editImageMode   = 'url';
     post.editHasMedia    = !!post.imageUrl;
     post.editRemoveMedia = false;
   }
@@ -270,8 +210,6 @@ export class HomeComponent implements OnInit {
     let imageUrl: string | null | undefined;
     if (post.editRemoveMedia) {
       imageUrl = null;
-    } else if (post.editImageMode === 'upload' && post.editImageData) {
-      imageUrl = post.editImageData;
     } else if (post.editImageUrl?.trim()) {
       imageUrl = post.editImageUrl.trim();
     } else if (post.editHasMedia) {

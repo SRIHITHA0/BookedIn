@@ -29,8 +29,6 @@ export interface Post {
   isEditing?: boolean;
   editContent?: string;
   editImageUrl?: string;      // new URL entered by user (empty = no change / keep existing)
-  editImageData?: string;     // base64 data URI from file upload in edit mode
-  editImageMode?: 'url' | 'upload';  // active tab in edit media section
   editHasMedia?: boolean;     // whether post had media when edit started
   editRemoveMedia?: boolean;  // user clicked "Remove media"
 }
