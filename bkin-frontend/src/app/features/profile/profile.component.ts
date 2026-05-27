@@ -166,9 +166,11 @@ export class ProfileComponent implements OnInit {
   // ── Post actions ──────────────────────────────────────────────────────
 
   startEditPost(post: Post): void {
-    post.isEditing   = true;
-    post.editContent = post.content;
-    post.editImageUrl = post.imageUrl ?? '';
+    post.isEditing       = true;
+    post.editContent     = post.content;
+    post.editImageUrl    = '';
+    post.editHasMedia    = !!post.imageUrl;
+    post.editRemoveMedia = false;
   }
 
   cancelEditPost(post: Post): void { post.isEditing = false; }
@@ -176,11 +178,25 @@ export class ProfileComponent implements OnInit {
   saveEditPost(post: Post): void {
     const content = (post.editContent ?? '').trim();
     if (!content) return;
-    this.postService.editPost(post.id, content, post.editImageUrl || null).subscribe({
+
+    let imageUrl: string | null | undefined;
+    if (post.editRemoveMedia) {
+      imageUrl = null;
+    } else if (post.editImageUrl?.trim()) {
+      imageUrl = post.editImageUrl.trim();
+    } else if (post.editHasMedia) {
+      imageUrl = undefined;   // keep existing — backend won't touch it
+    } else {
+      imageUrl = null;
+    }
+
+    post.isSaving = true;
+    this.postService.editPost(post.id, content, imageUrl).subscribe({
       next: (updated) => {
         const idx = this.myPosts.findIndex(p => p.id === post.id);
         if (idx !== -1) this.myPosts[idx] = { ...updated, isEditing: false, showComments: post.showComments };
-      }
+      },
+      error: () => { post.isSaving = false; }
     });
   }
 

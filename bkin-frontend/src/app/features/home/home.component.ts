@@ -218,13 +218,15 @@ export class HomeComponent implements OnInit {
       imageUrl = null;
     }
 
+    post.isSaving = true;
     this.postService.editPost(post.id, content, imageUrl).subscribe({
       next: (updated) => {
         const idx = this.posts.findIndex(p => p.id === post.id);
         if (idx !== -1) {
           this.posts[idx] = { ...updated, isEditing: false, showComments: post.showComments };
         }
-      }
+      },
+      error: () => { post.isSaving = false; }
     });
   }
 

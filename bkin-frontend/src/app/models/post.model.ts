@@ -27,6 +27,7 @@ export interface Post {
   newCommentText?: string;
   isSubmittingComment?: boolean;
   isEditing?: boolean;
+  isSaving?: boolean;         // Save button loader
   editContent?: string;
   editImageUrl?: string;      // new URL entered by user (empty = no change / keep existing)
   editHasMedia?: boolean;     // whether post had media when edit started
