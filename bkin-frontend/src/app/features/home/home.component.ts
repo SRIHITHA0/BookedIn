@@ -42,6 +42,9 @@ export class HomeComponent implements OnInit {
   // ── Right sidebar: trending books ticker ──────────────────────────────
   trendingBooks: Book[] = [];
 
+  // ── Image lightbox ────────────────────────────────────────────────────
+  lightboxUrl: string | null = null;
+
   // ── Create / Edit post modal ───────────────────────────────────────────
   showCreateModal  = false;
   newPostContent   = '';

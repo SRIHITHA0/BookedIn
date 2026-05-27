@@ -32,6 +32,9 @@ export class ProfileComponent implements OnInit {
   saveSuccess    = false;
   errorMessage   = '';
 
+  // ── Image lightbox ────────────────────────────────────────────────────
+  lightboxUrl: string | null = null;
+
   // ── My Posts ──────────────────────────────────────────────────────────
   myPosts: Post[] = [];
 

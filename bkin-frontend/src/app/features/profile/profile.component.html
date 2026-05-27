@@ -397,7 +397,8 @@
               <p class="text-white text-sm leading-relaxed whitespace-pre-wrap">{{ post.content }}</p>
             </div>
             <img *ngIf="post.imageUrl" [src]="post.imageUrl"
-              class="w-full h-auto max-h-[480px] object-cover block"
+              class="w-full h-auto max-h-[480px] object-cover block cursor-zoom-in"
+              (click)="lightboxUrl = post.imageUrl"
               onerror="this.style.display='none'" />
           </ng-container>
 
@@ -500,4 +501,21 @@
       </a>
     </div>
   </div>
+
+  <!-- ═══════════ IMAGE LIGHTBOX ═══════════ -->
+  <div *ngIf="lightboxUrl"
+    class="fixed inset-0 z-[60] bg-black/90 backdrop-blur-sm flex items-center justify-center p-4"
+    (click)="lightboxUrl = null">
+    <button (click)="lightboxUrl = null"
+      class="absolute top-4 right-4 text-white/70 hover:text-white bg-black/40 hover:bg-black/60 rounded-full p-2 transition-all">
+      <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+    <img [src]="lightboxUrl"
+      class="max-w-full max-h-[90vh] object-contain rounded-xl shadow-2xl"
+      (click)="$event.stopPropagation()"
+      onerror="this.style.display='none'" />
+  </div>
+
 </div>
