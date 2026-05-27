@@ -5,7 +5,7 @@
 @tailwind utilities;
 
 @layer base {
-  html { font-size: 17px; }
+  html { font-size: 21px; }
   body {
     background-color: #EFF4FF;
     color: #111827;
