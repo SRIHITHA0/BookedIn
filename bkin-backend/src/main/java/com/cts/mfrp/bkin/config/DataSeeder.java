@@ -2,14 +2,11 @@ package com.cts.mfrp.bkin.config;
 
 import com.cts.mfrp.bkin.entity.Book;
 import com.cts.mfrp.bkin.entity.Genre;
-import com.cts.mfrp.bkin.entity.User;
 import com.cts.mfrp.bkin.repository.BookRepository;
 import com.cts.mfrp.bkin.repository.GenreRepository;
-import com.cts.mfrp.bkin.repository.UserRepository;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 
 
@@ -36,21 +33,8 @@ public class DataSeeder {
     );
 
     @Bean
-    CommandLineRunner seedDatabase(GenreRepository genreRepository, BookRepository bookRepository,
-                                   UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    CommandLineRunner seedDatabase(GenreRepository genreRepository, BookRepository bookRepository) {
         return args -> {
-
-            // Seed the AI bot user if it doesn't exist yet
-            if (userRepository.findByUsername("BookBot").isEmpty()) {
-                User bot = new User();
-                bot.setUsername("BookBot");
-                bot.setEmail("ghost@bookedin.internal");
-                bot.setPassword(passwordEncoder.encode("!LibraryGhost#NotForLogin@2024"));
-                bot.setDisplayName("The Library Ghost");
-                bot.setBio("Your AI reading companion haunting the shelves of BookedIn.");
-                userRepository.save(bot);
-                System.out.println("[BookedIn] Bot user 'BookBot' created.");
-            }
 
             if (genreRepository.count() == 0) {
                 List<Genre> savedGenres = genreRepository.saveAll(List.of(

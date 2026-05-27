@@ -3,16 +3,13 @@ package com.cts.mfrp.bkin.controller;
 import com.cts.mfrp.bkin.dto.ChatMessageDto;
 import com.cts.mfrp.bkin.dto.ConversationDto;
 import com.cts.mfrp.bkin.dto.MessageResponseDto;
-import com.cts.mfrp.bkin.entity.Book;
 import com.cts.mfrp.bkin.entity.Message;
 import com.cts.mfrp.bkin.entity.User;
-import com.cts.mfrp.bkin.repository.BookRepository;
 import com.cts.mfrp.bkin.repository.ChatDeletionRepository;
 import com.cts.mfrp.bkin.repository.MessageRepository;
 import com.cts.mfrp.bkin.repository.UserBlockRepository;
 import com.cts.mfrp.bkin.repository.UserRepository;
 import com.cts.mfrp.bkin.entity.ChatDeletion;
-import com.cts.mfrp.bkin.service.AiChatService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -34,23 +31,17 @@ public class ChatController {
     private final SimpMessagingTemplate    messagingTemplate;
     private final MessageRepository        messageRepository;
     private final UserRepository           userRepository;
-    private final BookRepository           bookRepository;
-    private final AiChatService            aiChatService;
     private final ChatDeletionRepository   chatDeletionRepository;
     private final UserBlockRepository      userBlockRepository;
 
     public ChatController(SimpMessagingTemplate messagingTemplate,
                           MessageRepository messageRepository,
                           UserRepository userRepository,
-                          BookRepository bookRepository,
-                          AiChatService aiChatService,
                           ChatDeletionRepository chatDeletionRepository,
                           UserBlockRepository userBlockRepository) {
         this.messagingTemplate      = messagingTemplate;
         this.messageRepository      = messageRepository;
         this.userRepository         = userRepository;
-        this.bookRepository         = bookRepository;
-        this.aiChatService          = aiChatService;
         this.chatDeletionRepository = chatDeletionRepository;
         this.userBlockRepository    = userBlockRepository;
     }
@@ -101,30 +92,6 @@ public class ChatController {
         incoming.setSentAt(persisted.getSentAt().toString() + "Z");
 
         messagingTemplate.convertAndSend("/topic/chat/" + roomId, incoming);
-
-        // ── AI Bot Integration ────────────────────────────────────────────────
-        if (roomId.startsWith("ai_")) {
-            List<Book> libraryBooks = bookRepository.findAll();
-            String botResponse = aiChatService.getBotResponse(
-                    incoming.getContent(), libraryBooks, sender.getUsername());
-
-            userRepository.findByUsername("BookBot").ifPresent(botUser -> {
-                Message botMessage = new Message();
-                botMessage.setRoomId(roomId);
-                botMessage.setSender(botUser);
-                botMessage.setContent(botResponse);
-                botMessage.setMessageType(Message.MessageType.TEXT);
-                messageRepository.save(botMessage);
-            });
-
-            ChatMessageDto botMsg = new ChatMessageDto();
-            botMsg.setContent(botResponse);
-            botMsg.setSenderUsername("BookBot");
-            botMsg.setSenderDisplayName("The Library Ghost");
-            botMsg.setType("TEXT");
-            botMsg.setSentAt(java.time.Instant.now().toString() + "Z");
-            messagingTemplate.convertAndSend("/topic/chat/" + roomId, botMsg);
-        }
     }
 
     // ─────────────────────────────────────────────────────────────────────────

@@ -41,8 +41,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
 
   readonly groupRooms = ['general', 'fiction', 'mystery', 'sci-fi', 'fantasy', 'thriller'];
 
-  get aiRoom(): string { return `ai_${this.currentUsername}`; }
-
   get filteredPersonalConversations(): Conversation[] {
     const q = this.personalSearchQuery.trim().toLowerCase();
     if (!q) return this.personalConversations;
@@ -174,7 +172,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
   }
 
   get isDmRoom(): boolean  { return this.roomId.startsWith('dm_'); }
-  get isAiRoom(): boolean  { return this.roomId.startsWith('ai_'); }
 
   get roomDisplayName(): string {
     if (this.isDmRoom) {
@@ -184,7 +181,6 @@ export class ChatComponent implements OnInit, OnDestroy, AfterViewChecked {
       const parts = rest.split('_', 2);
       return parts.find(p => p !== this.currentUsername) ?? rest;
     }
-    if (this.isAiRoom) return 'The Library Ghost';
     return this.roomId.charAt(0).toUpperCase() + this.roomId.slice(1);
   }
 
